@@ -1,0 +1,9 @@
+---
+- name: "Check | Check Required Subnet Metadata"
+  fail: msg="You must specify the name of the VPC you wish to create, e.g. my-vpc"
+  when: vpc_subnets_metadata is undefined
+
+- name: "Check | Check Required Vpc Metadata"
+  fail: msg="You must run dependency role(vpc)"
+  when: vpc is undefined
+

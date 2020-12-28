@@ -1,0 +1,392 @@
+---
+# VPC Information
+vpc_cidr_block: 172.17.0.0/16
+
+# VPC Subnet Information
+vpc_subnets_metadata:
+  web_alb_a_zone:
+    cidr: 172.17.0.0/22
+    az_alias: a
+    system: PUB1
+    sequence: 01
+  web_alb_c_zone:
+    cidr: 172.17.4.0/22
+    az_alias: c
+    system: PUB1
+    sequence: 01
+  mgmt_a_zone:
+    cidr: 172.17.8.0/22
+    az_alias: a
+    system: MGMT
+    sequence: 01
+  was_alb_a_zone:
+    cidr: 172.17.12.0/22
+    az_alias: a
+    system: PRV1
+    sequence: 01
+  was_alb_c_zone:
+    cidr: 172.17.16.0/22
+    az_alias: c
+    system: PRV1
+    sequence: 01
+  web_server_a_zone:
+    cidr: 172.17.20.0/22
+    az_alias: a
+    system: PRV2
+    sequence: 01
+  web_server_c_zone:
+    cidr: 172.17.24.0/22
+    az_alias: c
+    system: PRV2
+    sequence: 01
+  was_server_a_zone:
+    cidr: 172.17.28.0/22
+    az_alias: a
+    system: PRV2
+    sequence: 01
+  was_server_c_zone:
+    cidr: 172.17.32.0/22
+    az_alias: c
+    system: PRV2
+    sequence: 02
+  DB_a_zone:
+    cidr: 172.17.36.0/22
+    az_alias: a
+    system: DATA
+    sequence: 01
+  DB_c_zone:
+    cidr: 172.17.40.0/22
+    az_alias: c
+    system: DATA
+    sequence: 01
+
+vpc_nats:
+  nat-01:
+    subnet: web_alb_a_zone
+  nat-02:
+    subnet: web_alb_c_zone
+
+vpc_routing_tables:
+  public:
+    number: 01
+    subnets:
+      - "{{ subnets.web_alb_a_zone.id }}"
+      - "{{ subnets.web_alb_c_zone.id }}"
+      - "{{ subnets.mgmt_a_zone.id }}"
+  private:
+    private01:
+      number: 01
+      domain: nat
+      subnets:
+        - "{{ subnets.web_server_a_zone.id }}"
+        - "{{ subnets.was_server_a_zone.id }}"
+      nat: nat-01
+    private02:
+      number: 02
+      domain: nat
+      subnets:
+        - "{{ subnets.web_server_c_zone.id }}"
+        - "{{ subnets.was_server_c_zone.id }}"
+      nat: nat-02
+    private03:
+      number: 01
+      domain: prv
+      subnets:
+        - "{{ subnets.was_alb_a_zone.id }}"
+        - "{{ subnets.was_alb_c_zone.id }}"
+    private04:
+      number: 01
+      domain: data
+      subnets:
+        - "{{ subnets.DB_a_zone.id }}"
+        - "{{ subnets.DB_c_zone.id }}"
+
+ec2_security_groups_metadata:
+  - name: mgmt
+    description: MGMT Rule
+  - name: webalb
+    description: Web ALB Rule
+  - name: wasalb
+    description: WAS ALB Rule
+  - name: web
+    description: WEB Rule
+  - name: was
+    description: WAS Rule
+  - name: data
+    description: Data Service Rule
+
+
+ec2_security_groups_rules:
+  mgmt:
+    rules:
+      - proto: tcp
+        group_id: "{{ security_groups.mgmt.group_id }}"
+        ports:
+          - 22
+          - 3389
+    rules_egress:
+      - proto: tcp
+        cidr_ip: 0.0.0.0/0
+        ports:
+          - 80
+          - 443
+      - proto: tcp
+        group_id: "{{ security_groups.web.group_id  }}"
+        ports:
+          - 22
+      - proto: tcp
+        group_id: "{{ security_groups.was.group_id  }}"
+        ports:
+          - 22
+      - proto: tcp
+        group_id: "{{ security_groups.data.group_id }}"
+        ports:
+          - 5543
+          - 6379
+  webalb:
+    rules:
+      - proto: tcp
+        cidr_ip: 0.0.0.0/0
+        ports:
+          - 80
+          - 443
+    rules_egress:
+      - proto: tcp
+        group_id: "{{ security_groups.web.group_id  }}"
+        ports:
+          - 80
+          - 443
+  wasalb:
+    rules:
+      - proto: tcp
+        group_id: "{{ security_groups.web.group_id   }}"
+        ports:
+          - 80
+    rules_egress:
+      - proto: tcp
+        group_id: "{{ security_groups.was.group_id  }}"
+        ports:
+          - 8080
+  web:
+    rules:
+      - proto: tcp
+        group_id: "{{ security_groups.webalb.group_id  }}"
+        ports:
+          - 80
+          - 443
+    rules_egress:
+      - proto: tcp
+        group_id: "{{ security_groups.wasalb.group_id}}"
+        ports:
+          - 80
+  was:
+    rules:
+      - proto: tcp
+        group_id: "{{ security_groups.webalb.group_id }}"
+        ports:
+          - 8080
+    rules_egress:
+      - proto: tcp
+        cidr_ip: 0.0.0.0/0
+        from_port: 1
+        to_port: 65535
+
+  data:
+    rules:
+      - proto: tcp
+        group_id: "{{ security_groups.data.group_id  }}"
+        ports:
+          - 5543
+          - 6379
+      - proto: tcp
+        group_id: "{{ security_groups.was.group_id  }}"
+        ports:
+          - 5543
+          - 6379
+
+aws_iam_role:
+  - name: aplz-ec2-basic-web
+  - name: aplz-ec2-basic-was
+  - name: aplz-ec2-basic-mgmt
+
+ec2_bastion:
+  type: t3.micro
+  iam_profile: aplz-ec2-basic-mgmt
+  subnet: mgmt_a_zone
+  image: ami-0ce107ae7af2e92b5
+  key_name: bespin-opin-ssh
+  instance_profile: aplz-ec2-basic-mgmt
+
+e2_instance:
+  web01:
+    name: WEB
+    num: 01
+    image: ami-0ce107ae7af2e92b5 # Golden Image 변경 필요
+    key_name: bespin-opin-ssh
+    subnet: web_server_a_zone
+    az_alias: a
+    type: t2.micro
+    groups:
+        - "{{ security_groups.web.group_id  }}"
+  web02:
+    name: WEB
+    num: 02
+    image: ami-0ce107ae7af2e92b5 # Golden Image 변경 필요
+    key_name: bespin-opin-ssh
+    subnet: web_server_c_zone
+    az_alias: c
+    type: t2.micro
+    groups:
+      - "{{ security_groups.web.group_id  }}"
+  was01:
+    name: WAS
+    num: 01
+    image: ami-0ce107ae7af2e92b5 # Golden Image 변경 필요
+    key_name: bespin-opin-ssh
+    subnet: was_server_c_zone
+    az_alias: a
+    type: t2.micro
+    groups:
+      - "{{ security_groups.was.group_id  }}"
+  was02:
+    name: WAS
+    num: 02
+    image: ami-0ce107ae7af2e92b5 # Golden Image 변경 필요
+    key_name: bespin-opin-ssh
+    subnet: was_server_c_zone
+    az_alias: c
+    type: t2.micro
+    groups:
+      - "{{ security_groups.was.group_id  }}"
+
+autoscaling:
+  launch_configurations:
+    web:
+      name: web
+      type: t3.micro
+      security_groups:
+        - "{{ security_groups.was.group_id  }}"
+      key_name: bespin-opin-ssh
+      image: ami-0ce107ae7af2e92b5 # Golden Image 변경 필요
+      instance_profile_name: aplz-ec2-basic-web
+    was:
+      name: was
+      type: t3.micro
+      security_groups:
+        - "{{ security_groups.web.group_id  }}"
+      key_name: bespin-opin-ssh
+      image: ami-0ce107ae7af2e92b5 # Golden Image 변경 필요
+      instance_profile_name: aplz-ec2-basic-was
+  autoscaling_groups:
+    web:
+      name: web
+      launch_config_name: web
+      subnets:
+        - "{{ subnets.web_server_a_zone.id }}"
+        - "{{ subnets.web_server_c_zone.id }}"
+      capacity:
+        desired: 2
+        min: 2
+        max: 4
+      load_balancers:
+        - "{{ application_lb.web_alb.load_balancer_name| default([]) }}"
+      target_groups:
+        - "{{ target_groups.web_alb.http.target_group_arn  | default([])  }}"
+    was:
+      name: was
+      launch_config_name: was
+      subnets:
+        - "{{ subnets.was_server_a_zone.id }}"
+        - "{{ subnets.was_server_c_zone.id }}"
+      capacity:
+        desired: 2
+        min: 2
+        max: 4
+      tags:
+        - deploy : codedeploy
+        - propagate_at_launch: yes
+      load_balancers:
+        - "{{ application_lb.was_alb.load_balancer_name| default([]) }}"
+      target_groups:
+        - "{{ target_groups.was_alb.http.target_group_arn  | default([])  }}"
+
+alb:
+  web_alb:
+    name: WEB
+    system: PUB1
+    subnets:
+      - "{{ subnets.web_server_a_zone.id}}"
+      - "{{ subnets.web_server_c_zone.id}}"
+    groups:
+      - "{{ security_groups.webalb.group_id  }}"
+    listeners:
+      - Protocol: HTTP
+        Port: 80
+        DefaultActions:
+          - Type: forward
+            TargetGroupName: "{{ target_groups.web_alb.http.target_group_name  | default([])  }}"
+  was_alb:
+    name: WAS
+    system: PRI1
+    subnets:
+      - "{{ subnets.was_alb_a_zone.id}}"
+      - "{{ subnets.was_alb_c_zone.id}}"
+    groups:
+      - "{{ security_groups.wasalb.group_id  }}"
+    listeners:
+      - Protocol: HTTP
+        Port: 8080
+        DefaultActions:
+          - Type: forward
+            TargetGroupName:  "{{ target_groups.was_alb.http.target_group_name  | default([])  }}"
+
+target_group:
+  - name: http
+    port : 80
+    protocol: http
+    health_check:
+      path: /index.html
+      code: 200
+    alb: web_alb
+  - name: http
+    port : 8080
+    protocol: http
+    health_check:
+      path: /app/index.jsp
+      code: 200
+    alb: was_alb
+
+
+rds_metadata:
+  instances:
+    - name: APLZPG
+      num: 01
+      db_engine: postgres
+      engine_version: 10.6
+      instance_type: db.t3.medium
+      size: 30
+      username: rds_admin
+      password: Pa55w0rd
+      subnet_group: aplzpg
+      security_groups:
+        - "{{ security_groups.data.group_id }}"
+  subnet_group:
+    aplzpg:
+      name: aplzpg
+      num: 01
+      description: "Subnet Group For APLZPG"
+      subnets:
+        - "{{ subnets.DB_a_zone.id}}"
+        - "{{ subnets.DB_c_zone.id}}"
+
+s3_bucket_metadata:
+  - upload
+  - static
+  - log
+s3_bucket_logging_metadata:
+  upload:
+    target_bucket: log
+    target_prefix: s3
+  static:
+    target_bucket: log
+    target_prefix: s3

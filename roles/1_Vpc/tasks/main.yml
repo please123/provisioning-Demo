@@ -1,0 +1,11 @@
+---
+- name: "Create Virtual Private Cloud"
+  ec2_vpc_net:
+    name: "{{ default_prefix }}{{ REGIONS[default_region] }}-{{ default_account_alias }}"
+    cidr_block: "{{ vpc_cidr_block }}"
+    region: "{{ default_region }}"
+  register: create_vpc
+
+- name: "Gathering Virtual Private Cloud Information"
+  ansible.builtin.set_fact:
+    vpc: '{{ create_vpc.vpc }}'

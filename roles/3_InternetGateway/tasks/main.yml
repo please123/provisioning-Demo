@@ -1,0 +1,12 @@
+- name: Create Internet Gateway
+  ec2_vpc_igw:
+    vpc_id: "{{ vpc.id }}"
+    region: "{{ default_region }}"
+    tags:
+      name: "{{ default_prefix }}{{ REGIONS[default_region] }}-{{ default_account_alias }}-igw"
+  register: create_igw
+
+- name: "Gathering Internet Gateway Information Information"
+  ansible.builtin.set_fact:
+    igw: '{{ create_igw }}'
+

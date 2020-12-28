@@ -1,0 +1,34 @@
+---
+- name: "Create RDS Subnet Group"
+  rds_subnet_group:
+    state: present
+    name: "{{ item.value.name }}"
+    description: "{{ item.value.description }}"
+    region: "{{ default_region }}"
+    subnets: "{{ item.value.subnets }}"
+  with_dict: "{{ rds_metadata.subnet_group}}"
+  register: create_rds_subnet_group
+
+- name: "Gathering RDS SubnetGroup Information"
+  set_fact:
+    rds_subnet_group: "{{ rds_subnet_group | default({}) |
+    combine({ item.subnet_group.name : item.subnet_group })
+    }}"
+  loop: "{{ create_rds_subnet_group.results }}"
+
+- name: "Create RDS Instance"
+  rds:
+    command: create
+    instance_name: "{{ default_prefix }}{{ REGIONS[default_region] }}-{{ default_account_alias }}-{{default_platform}}-{{item.name}}"
+    db_engine: "{{ item.db_engine | default('mysql') }}"
+    engine_version: "{{ item.engine_version | default('5.5.57')}}"
+    size: "{{item.size}}"
+    instance_type: "{{item.instance_type}}"
+    subnet: "{{ rds_subnet_group[item.subnet_group].name }}"
+    vpc_security_groups: "{{ item.security_groups}} "
+    username: "{{ item.username}}"
+    password: "{{ item.password}}"
+    region: "{{ default_region }}"
+  loop: "{{ rds_metadata.instances }}"
+
+

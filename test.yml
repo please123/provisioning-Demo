@@ -1,0 +1,21 @@
+---
+- hosts: localhost
+  gather_facts: no
+  vars:
+    vhosts:
+      git_branch_1:
+        - { a: example.com, customer: a }
+        - { a: example.com, customer: b }
+        - { a: example.org, customer: a }
+      git_branch_2:
+        - { a: example.com, customer: x }
+        - { a: example.org, customer: y }
+  tasks:
+    - set_fact:
+        tmp_vhosts: "{{ item.value | map('combine',dict(branch=item.key)) | list }}"
+      with_dict: "{{ vhosts }}"
+      register: combined_vhosts
+    - set_fact:
+        combined_vhosts: "{{ combined_vhosts.results | map(attribute='ansible_facts.tmp_vhosts') | sum(start=[]) }}"
+    - debug:
+        msg: "{{ combined_vhosts }}"

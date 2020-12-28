@@ -1,0 +1,17 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: False
+  vars_files:
+    - group_vars/default.yml
+    - group_vars/provisioning.yml
+    - group_vars/constant.yml
+  roles:
+    - vpc
+    - securitygroup
+    - iam
+    - ec2
+    - alb
+    - autoscaling
+#    - rds
+    - s3

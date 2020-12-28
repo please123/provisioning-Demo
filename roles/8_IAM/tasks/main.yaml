@@ -1,0 +1,6 @@
+- name: "Create IAM Role For Access S3 From Instance"
+  iam_role :
+    name: "{{item.name}}"
+    assume_role_policy_document: " {{ lookup( 'file', 'template/s3_policy.json') }} "
+    region: "{{ default_region }}"
+  loop: "{{aws_iam_role}}"

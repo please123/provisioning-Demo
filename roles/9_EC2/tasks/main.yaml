@@ -1,0 +1,20 @@
+---
+- name: "create a new ec2 key pair, returns generated private key"
+  ec2_key:
+    name: "{{ ec2_bastion.key_name }}"
+    region: "{{ default_region }}"
+    wait: true
+  register: bastion_keyfile
+
+- name: "Create EC2 Bastion Instance"
+  ec2:
+    key_name: "{{ ec2_bastion.key_name }}"
+    image: "{{ ec2_bastion.image }}"
+    instance_type: t2.micro
+    region: "{{ default_region }}"
+    vpc_subnet_id: "{{subnets[ec2_bastion.subnet].id}}"
+    assign_public_ip: yes
+    instance_tags:
+      Name: "{{ default_prefix }}{{ REGIONS[default_region] }}-{{ default_account_alias }}-a-{{default_platform}}-bastion"
+    wait: true
+    count: 1

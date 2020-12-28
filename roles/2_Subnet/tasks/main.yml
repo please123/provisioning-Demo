@@ -1,0 +1,19 @@
+---
+# Check pre-requisites
+- include: pre-requisites.yml
+
+- name: "Create Virtual Private Cloud Subnet"
+  ec2_vpc_subnet:
+    vpc_id: "{{vpc.id}}"
+    cidr: "{{item.value.cidr}}"
+    az: "{{ default_region }}{{ item.value.az_alias}}"
+    region: "{{default_region}}"
+    tags:
+      name: "{{default_prefix}}{{REGIONS[default_region]}}-{{default_account_alias}}-{{item.value.az_alias}}-{{item.value.system}}-{{item.value.sequence}}"
+  with_dict: "{{ vpc_subnets_metadata }}"
+  register: create_vpc_subnets
+
+- name: "Gathering Virtual Private Cloud Subnet Information"
+  ansible.builtin.set_fact:
+    subnets: "{{ subnets | default({}) | combine({ item.item.key : item.subnet  }) }}"
+  loop: "{{create_vpc_subnets.results}}"

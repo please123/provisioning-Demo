@@ -1,0 +1,32 @@
+---
+default_prefix: AP
+default_region: ap-northeast-2
+default_account_alias: APKPOC
+default_platform: APLZ
+default_state: present
+
+
+
+# Constant Variable
+REGIONS:
+  us-east-1: UE1
+  us-east-2: UE2
+  us-west-1: UW1
+  us-west-2: UW2
+  af-south-1: AS1
+  ap-east-1: AE1
+  ap-south-1: AS1
+  ap-northeast-3: NE3
+  ap-northeast-2: NE2
+  ap-southeast-1: SE1
+  ap-southeast-2: SE2
+  ap-northeast-1: NE1
+  ca-central-1: CC1
+  eu-central-1: EC1
+  eu-west-1: EW1
+  eu-west-2: EW2
+  eu-south-1: ES1
+  eu-west-3: EW3
+  eu-north-1: EN1
+  me-south-1: MS1
+  sa-east-1: SE1
