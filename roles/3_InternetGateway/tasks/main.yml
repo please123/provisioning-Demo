@@ -3,7 +3,7 @@
     vpc_id: "{{ vpc.id }}"
     region: "{{ default_region }}"
     tags:
-      name: "{{ default_prefix }}{{ REGIONS[default_region] }}-{{ default_account_alias }}-igw"
+      Name: "{{ default_prefix }}{{ REGIONS[default_region] }}-{{ default_account_alias }}-igw"
   register: create_igw
 
 - name: "Gathering Internet Gateway Information Information"
