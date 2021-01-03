@@ -1,11 +1,4 @@
 ---
-- name: "create a new ec2 key pair, returns generated private key"
-  ec2_key:
-    name: "{{ ec2_bastion.key_name }}"
-    region: "{{ default_region }}"
-    wait: true
-  register: bastion_keyfile
-
 - name: "Create EC2 Bastion Instance"
   ec2:
     key_name: "{{ ec2_bastion.key_name }}"

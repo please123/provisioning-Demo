@@ -213,51 +213,9 @@ ec2_bastion:
   type: t3.micro
   iam_profile: aplz-ec2-basic-mgmt
   subnet: mgmt_a_zone
-  image: ami-0ce107ae7af2e92b5
-  key_name: bespin-opin-ssh
+  image: ami-0094965d55b3bb1ff   # Amazon Linux 2 AMI
+  key_name: amr-poc-key-test
   instance_profile: aplz-ec2-basic-mgmt
-
-e2_instance:
-  web01:
-    name: WEB
-    num: 01
-    image: ami-0ce107ae7af2e92b5 # Golden Image 변경 필요
-    key_name: bespin-opin-ssh
-    subnet: web_server_a_zone
-    az_alias: a
-    type: t2.micro
-    groups:
-        - "{{ security_groups.web.group_id  }}"
-  web02:
-    name: WEB
-    num: 02
-    image: ami-0ce107ae7af2e92b5 # Golden Image 변경 필요
-    key_name: bespin-opin-ssh
-    subnet: web_server_c_zone
-    az_alias: c
-    type: t2.micro
-    groups:
-      - "{{ security_groups.web.group_id  }}"
-  was01:
-    name: WAS
-    num: 01
-    image: ami-0ce107ae7af2e92b5 # Golden Image 변경 필요
-    key_name: bespin-opin-ssh
-    subnet: was_server_c_zone
-    az_alias: a
-    type: t2.micro
-    groups:
-      - "{{ security_groups.was.group_id  }}"
-  was02:
-    name: WAS
-    num: 02
-    image: ami-0ce107ae7af2e92b5 # Golden Image 변경 필요
-    key_name: bespin-opin-ssh
-    subnet: was_server_c_zone
-    az_alias: c
-    type: t2.micro
-    groups:
-      - "{{ security_groups.was.group_id  }}"
 
 autoscaling:
   launch_configurations:
@@ -266,16 +224,16 @@ autoscaling:
       type: t3.micro
       security_groups:
         - "{{ security_groups.was.group_id  }}"
-      key_name: bespin-opin-ssh
-      image: ami-0ce107ae7af2e92b5 # Golden Image 변경 필요
+      key_name: bespin-amore-poc-web
+      image: ami-0c6bfbd045ac8b8ec # Golden Image 변경 필요
       instance_profile_name: aplz-ec2-basic-web
     was:
       name: was
       type: t3.micro
       security_groups:
         - "{{ security_groups.web.group_id  }}"
-      key_name: bespin-opin-ssh
-      image: ami-0ce107ae7af2e92b5 # Golden Image 변경 필요
+      key_name: bespin-amore-poc-was
+      image: ami-060043fbfcc808337 # Golden Image 변경 필요
       instance_profile_name: aplz-ec2-basic-was
   autoscaling_groups:
     web:
