@@ -2,5 +2,5 @@
   iam_role :
     name: "{{item.name}}"
     region: "{{ default_region }}"
-    assume_role_policy_document: " {{ lookup( 'file', 'template/s3_policy.json') }} "  처리가 안됨.
+    assume_role_policy_document: "{{ lookup( 'file', 'template/s3_policy.json') }}"
   loop: "{{aws_iam_role}}"
