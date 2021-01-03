@@ -12,4 +12,5 @@
     iam_type: role
     region: "{{ default_region }}"
     policy_document : "{{ lookup( 'file', 'template/s3_policy.json') }}"
+    state: present
   loop: "{{aws_iam_role}}"
