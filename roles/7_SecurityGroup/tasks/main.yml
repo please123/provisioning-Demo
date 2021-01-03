@@ -17,14 +17,13 @@
     }}"
   loop: "{{ create_security_groups.results }}"
 
-# Skip For Test
-#- name: "Set Up Security Group Rule"
-#  ec2_group:
-#    name: "{{ item.value.group_name }}"
-#    description: "{{ item.value.item.description }}"
-#    vpc_id: "{{ vpc.id }}"
-#    rules: "{{ ec2_security_groups_rules[item.key].rules| default([]) }}"
-#    rules_egress: "{{ ec2_security_groups_rules[item.key].rules_egress | default([]) }}"
-#    region: "{{default_region}}"
-#  with_dict: "{{ security_groups }}"
+- name: "Set Up Security Group Rule"
+  ec2_group:
+    name: "{{ item.value.group_name }}"
+    description: "{{ item.value.item.description }}"
+    vpc_id: "{{ vpc.id }}"
+    rules: "{{ ec2_security_groups_rules[item.key].rules| default([]) }}"
+    rules_egress: "{{ ec2_security_groups_rules[item.key].rules_egress | default([]) }}"
+    region: "{{default_region}}"
+  with_dict: "{{ security_groups }}"
 
