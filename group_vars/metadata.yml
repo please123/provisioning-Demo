@@ -161,7 +161,7 @@ ec2_security_groups_rules:
       - proto: tcp
         group_id: "{{ security_groups.web.group_id   }}"
         ports:
-          - 80
+          - 8080
     rules_egress:
       - proto: tcp
         group_id: "{{ security_groups.was.group_id  }}"
@@ -178,7 +178,7 @@ ec2_security_groups_rules:
       - proto: tcp
         group_id: "{{ security_groups.wasalb.group_id}}"
         ports:
-          - 80
+          - 8080
   was:
     rules:
       - proto: tcp
@@ -190,7 +190,6 @@ ec2_security_groups_rules:
         cidr_ip: 0.0.0.0/0
         from_port: 1
         to_port: 65535
-
   data:
     rules:
       - proto: tcp

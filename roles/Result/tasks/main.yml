@@ -1,0 +1,3 @@
+- name: "Finish Provisioning"
+  debug:
+    msg: "{VPC ID : {{vpc.id}}, ALB Information : {{ application_lb }} }"
