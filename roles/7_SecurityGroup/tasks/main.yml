@@ -5,6 +5,8 @@
     description: "{{item.description}}"
     vpc_id: "{{vpc.id}}"
     region: "{{default_region}}"
+    tags:
+      Name: "{{default_prefix}}{{REGIONS[default_region]}}-{{default_account_alias}}-{{default_platform}}-{{item.name}}"
   loop: "{{ ec2_security_groups_metadata }}"
   register: create_security_groups
 
