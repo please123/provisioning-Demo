@@ -9,6 +9,6 @@
     assign_public_ip: yes
     instance_tags:
       Name: "{{ default_prefix }}{{ REGIONS[default_region] }}-{{ default_account_alias }}-a-{{default_platform}}-bastion"
-    group: "{{ec2_bastion.security_groups}}"
+    group_id: "{{ec2_bastion.security_groups}}"
     wait: true
     count: 1
