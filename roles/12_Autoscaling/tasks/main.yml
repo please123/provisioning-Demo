@@ -25,7 +25,7 @@
     name: "{{ default_prefix }}{{ REGIONS[default_region] }}-{{ default_account_alias }}-{{item.value.name}}-asg"
     launch_config_name: "{{ launch_configurations[item.key].name}}"
     health_check_period: 60
-    health_check_type: ELB
+    health_check_type: EC2
     min_size: "{{item.value.capacity.min}}"
     max_size: "{{item.value.capacity.max}}"
     desired_capacity: "{{item.value.capacity.desired}}"
