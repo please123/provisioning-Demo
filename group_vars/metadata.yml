@@ -120,7 +120,7 @@ ec2_security_groups_rules:
   mgmt:
     rules:
       - proto: tcp
-        group_id: "{{ security_groups.mgmt.group_id }}"
+        cidr_ip: 0.0.0.0/0
         ports:
           - 22
           - 3389
