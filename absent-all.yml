@@ -6,7 +6,7 @@
     - group_vars/default.yml
     - group_vars/metadata.yml
   tasks:
-    - import_role:
+    - include_role:
         name: myrole
         tasks_from: absent
       loop:
