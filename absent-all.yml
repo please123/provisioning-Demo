@@ -7,7 +7,7 @@
     - group_vars/metadata.yml
   tasks:
     - include_role:
-        name: myrole
+        name: '{{item}}'
         tasks_from: absent
       loop:
         - 12_Autoscaling
