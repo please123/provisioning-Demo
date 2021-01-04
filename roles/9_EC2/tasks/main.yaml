@@ -1,14 +1,13 @@
 ---
 - name: "Create EC2 Bastion Instance"
-  ec2:
+  ec2_instance:
+    name: "{{ default_prefix }}{{ REGIONS[default_region] }}-{{ default_account_alias }}-a-{{default_platform}}-bastion"
     key_name: "{{ ec2_bastion.key_name }}"
-    image: "{{ ec2_bastion.image }}"
+    image_id: "{{ ec2_bastion.image }}"
     instance_type: t2.micro
     region: "{{ default_region }}"
     vpc_subnet_id: "{{subnets[ec2_bastion.subnet].id}}"
-    assign_public_ip: yes
-    instance_tags:
-      Name: "{{ default_prefix }}{{ REGIONS[default_region] }}-{{ default_account_alias }}-a-{{default_platform}}-bastion"
-    group_id: "{{ec2_bastion.security_groups}}"
+    network:
+      assign_public_ip: true
+    security_groups: "{{ec2_bastion.security_groups}}"
     wait: true
-    count: 1
