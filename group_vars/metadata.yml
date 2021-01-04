@@ -182,7 +182,7 @@ ec2_security_groups_rules:
   was:
     rules:
       - proto: tcp
-        group_id: "{{ security_groups.webalb.group_id }}"
+        group_id: "{{ security_groups.wasalb.group_id }}"
         ports:
           - 8080
     rules_egress:
@@ -263,7 +263,7 @@ autoscaling:
         min: 2
         max: 4
       tags:
-        - Name: "{{ default_prefix }}{{ REGIONS[default_region] }}-{{ default_account_alias }}-{{default_platform}}-WEB"
+        - Name: "{{ default_prefix }}{{ REGIONS[default_region] }}-{{ default_account_alias }}-{{default_platform}}-WAS"
         - deploy : codedeploy
         - propagate_at_launch: yes
       load_balancers:
