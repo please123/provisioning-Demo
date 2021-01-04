@@ -70,36 +70,36 @@ vpc_routing_tables:
   public:
     number: 01
     subnets:
-      - "{{ subnets.web_alb_a_zone.id }}"
-      - "{{ subnets.web_alb_c_zone.id }}"
-      - "{{ subnets.mgmt_a_zone.id }}"
+      - "{{ subnets.web_alb_a_zone.id | default('')}}"
+      - "{{ subnets.web_alb_c_zone.id | default('')}}"
+      - "{{ subnets.mgmt_a_zone.id | default('')}}"
   private:
     private01:
       number: 01
       domain: nat
       subnets:
-        - "{{ subnets.web_server_a_zone.id }}"
-        - "{{ subnets.was_server_a_zone.id }}"
+        - "{{ subnets.web_server_a_zone.id | default('')}}"
+        - "{{ subnets.was_server_a_zone.id | default('')}}"
       nat: nat-01
     private02:
       number: 02
       domain: nat
       subnets:
-        - "{{ subnets.web_server_c_zone.id }}"
-        - "{{ subnets.was_server_c_zone.id }}"
+        - "{{ subnets.web_server_c_zone.id | default('')}}"
+        - "{{ subnets.was_server_c_zone.id | default('')}}"
       nat: nat-02
     private03:
       number: 01
       domain: prv
       subnets:
-        - "{{ subnets.was_alb_a_zone.id }}"
-        - "{{ subnets.was_alb_c_zone.id }}"
+        - "{{ subnets.was_alb_a_zone.id | default('')}}"
+        - "{{ subnets.was_alb_c_zone.id | default('')}}"
     private04:
       number: 01
       domain: data
       subnets:
-        - "{{ subnets.DB_a_zone.id }}"
-        - "{{ subnets.DB_c_zone.id }}"
+        - "{{ subnets.DB_a_zone.id | default('')}}"
+        - "{{ subnets.DB_c_zone.id | default('')}}"
 
 ec2_security_groups_metadata:
   - name: mgmt
@@ -224,7 +224,7 @@ ec2_bastion:
   key_name: amore-poc-bastion
   instance_profile: aplz-ec2-basic-mgmt
   security_groups:
-    - "{{ security_groups.mgmt.group_id  }}"
+    - "{{ security_groups.mgmt.group_id  | default('')}}"
 
 autoscaling:
   launch_configurations:
@@ -286,10 +286,10 @@ alb:
     name: WEB
     system: PUB1
     subnets:
-      - "{{ subnets.web_alb_a_zone.id}}"
-      - "{{ subnets.web_alb_c_zone.id}}"
+      - "{{ subnets.web_alb_a_zone.id | default('')}}"
+      - "{{ subnets.web_alb_c_zone.id | default('')}}"
     groups:
-      - "{{ security_groups.webalb.group_id  }}"
+      - "{{ security_groups.webalb.group_id | default('') }}"
     listeners:
       - Protocol: HTTP
         Port: 80
@@ -301,10 +301,10 @@ alb:
     system: PRI1
     scheme: internal
     subnets:
-      - "{{ subnets.was_alb_a_zone.id}}"
-      - "{{ subnets.was_alb_c_zone.id}}"
+      - "{{ subnets.was_alb_a_zone.id | default('') }}"
+      - "{{ subnets.was_alb_c_zone.id | default('') }}"
     groups:
-      - "{{ security_groups.wasalb.group_id  }}"
+      - "{{ security_groups.wasalb.group_id | default('') }}"
     listeners:
       - Protocol: HTTP
         Port: 8080
@@ -341,15 +341,15 @@ rds_metadata:
       password: Pa55w0rd
       subnet_group: aplzpg
       security_groups:
-        - "{{ security_groups.data.group_id }}"
+        - "{{ security_groups.data.group_id | default('')}}"
   subnet_group:
     aplzpg:
       name: aplzpg
       num: 01
       description: "Subnet Group For APLZPG"
       subnets:
-        - "{{ subnets.DB_a_zone.id}}"
-        - "{{ subnets.DB_c_zone.id}}"
+        - "{{ subnets.DB_a_zone.id | default('')}}"
+        - "{{ subnets.DB_c_zone.id | default('')}}"
 
 s3_bucket_metadata:
   - upload
