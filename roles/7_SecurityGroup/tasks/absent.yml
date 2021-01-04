@@ -3,7 +3,6 @@
   ec2_group:
     name: "{{default_prefix}}{{REGIONS[default_region]}}-{{default_account_alias}}-{{default_platform}}-{{item.name}}"
     description: "{{item.description}}"
-    vpc_id: "{{vpc.id}}"
     region: "{{default_region}}"
     tags:
       Name: "{{default_prefix}}{{REGIONS[default_region]}}-{{default_account_alias}}-{{default_platform}}-{{item.name}}"
@@ -16,7 +15,6 @@
   ec2_group:
     name: "{{default_prefix}}{{REGIONS[default_region]}}-{{default_account_alias}}-{{default_platform}}-{{item.name}}"
     description: "{{item.description}}"
-    vpc_id: "{{vpc.id}}"
     region: "{{default_region}}"
     state: absent
   loop: "{{ ec2_security_groups_metadata }}"
