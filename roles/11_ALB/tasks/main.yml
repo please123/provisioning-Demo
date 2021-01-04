@@ -8,6 +8,13 @@
     listeners: "{{ item.value.listeners}}"
     scheme: "{{item.value.scheme | default('internet-facing')}}"
     region: "{{default_region}}"
+    tags:
+      Name: "{{ default_account_alias }}-{{default_platform}}-{{item.value.system}}-ALB-{{item.value.name}}"
+      Company: "{{default_prefix}}"
+      Country: KR
+      Service: "{{item.value.service}}"
+      Stage: "{{default_stage}}"
+      USE: WASALB
   with_dict: "{{ alb }}"
   register: create_application_lb
 

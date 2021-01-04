@@ -1,7 +1,22 @@
 ---
+- name: "Gather information about a target groups named"
+  elb_target_group_info:
+    names:
+      - "{{ default_account_alias }}-{{default_platform}}-{{alb[item.alb].system}}-ALB-{{alb[item.alb].name}}"
+  loop: "{{ target_group }}"
+  register: get_target_group_info
+
+- name: "Gathering Exists TargetGroup Information"
+  when:
+    - item['target_groups']|length>0
+  set_fact:
+    target_groups: "{{ target_groups | default({}) | combine({item.item.alb:{item.item.name:item.target_groups[0] } }) }}"
+  loop: "{{ get_target_group_info.results }}"
+
 - name: "Create Target Group For Application LoadBalancer"
+  when: target_groups is undefined  or item.alb not in (target_groups.keys()|list)
   elb_target_group:
-    name: "{{ default_account_alias }}-{{default_platform}}-{{alb[item.alb].system}}-ALB-{{alb[item.alb].name}}-{{ item.name }}"
+    name: "{{ default_account_alias }}-{{default_platform}}-{{alb[item.alb].system}}-ALB-{{alb[item.alb].name}}"
     protocol: "{{ item.protocol }}"
     port: "{{ item.port }}"
     vpc_id: "{{ vpc.id }}"
@@ -10,12 +25,17 @@
     successful_response_codes: "{{ item.health_check.code | default(200) }}"
     state: present
     region: "{{default_region}}"
+    tags:
+      Name: "{{ default_account_alias }}-{{default_platform}}-{{alb[item.alb].system}}-ALB-{{alb[item.alb].name}}"
+      Company: "{{default_prefix}}"
+      Country: KR
+      Service: "{{item.service}}"
+      Stage: "{{default_stage}}"
   loop: "{{ target_group }}"
   register: create_target_group
 
 - name: "Gathering Target Group Information"
+  when: item.skipped is not defined or not item.skipped
   set_fact:
-    target_groups: "{{ target_groups | default({}) |
-    combine({ item.item.alb : { item.item.name : item }})
-    }}"
+    target_groups: "{{ target_groups | default({}) | combine( { item.item.alb : {item.item.name : item} })}}"
   loop: "{{ create_target_group.results }}"

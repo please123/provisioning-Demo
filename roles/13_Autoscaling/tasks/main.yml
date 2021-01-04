@@ -24,8 +24,8 @@
   ec2_asg:
     name: "{{ default_prefix }}{{ REGIONS[default_region] }}-{{ default_account_alias }}-{{item.value.name}}-asg"
     launch_config_name: "{{ launch_configurations[item.key].name}}"
-    health_check_period: 60
-    health_check_type: EC2
+    health_check_period: 300
+    health_check_type: ELB
     min_size: "{{item.value.capacity.min}}"
     max_size: "{{item.value.capacity.max}}"
     desired_capacity: "{{item.value.capacity.desired}}"
@@ -36,3 +36,10 @@
     wait_for_instances: FALSE
   register: create_autosclaing_group
   with_dict: "{{ autoscaling.autoscaling_groups }}"
+
+- name: "Gathering Auto Scaling Group Information"
+  set_fact:
+    autoscaling_groups: "{{ autoscaling_groups | default({}) |
+  combine({ item.item.key: item })
+  }}"
+  loop: "{{ create_autosclaing_group.results }}"

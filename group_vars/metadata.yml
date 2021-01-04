@@ -2,6 +2,11 @@
 # VPC Information
 vpc_cidr_block: 172.17.0.0/16
 
+vpc_tags:
+  Company: "{{default_prefix}}"
+  Country: KR
+  Service: VPC
+  Stage: "{{default_stage}}"
 # VPC Subnet Information
 vpc_subnets_metadata:
   web_alb_a_zone:
@@ -9,56 +14,67 @@ vpc_subnets_metadata:
     az_alias: a
     system: PUB1
     sequence: 01
+    service: Public Zone Subnet
   web_alb_c_zone:
     cidr: 172.17.4.0/22
     az_alias: c
     system: PUB1
     sequence: 01
+    service: Public Zone Subnet
   mgmt_a_zone:
     cidr: 172.17.8.0/22
     az_alias: a
     system: MGMT
     sequence: 01
+    service: Mgmt Zone Subnet
   was_alb_a_zone:
     cidr: 172.17.12.0/22
     az_alias: a
     system: PRV1
     sequence: 01
+    service : Private Wasalb Zone Subent
   was_alb_c_zone:
     cidr: 172.17.16.0/22
     az_alias: c
     system: PRV1
     sequence: 01
+    service : Private Wasalb Zone Subent
   web_server_a_zone:
     cidr: 172.17.20.0/22
     az_alias: a
     system: PRV2
     sequence: 01
+    service : Private Web Zone Subent
   web_server_c_zone:
     cidr: 172.17.24.0/22
     az_alias: c
     system: PRV2
     sequence: 01
+    service : Private Web Zone Subent
   was_server_a_zone:
     cidr: 172.17.28.0/22
     az_alias: a
     system: PRV2
     sequence: 01
+    service : Private Was Zone Subnet
   was_server_c_zone:
     cidr: 172.17.32.0/22
     az_alias: c
     system: PRV2
     sequence: 02
+    service : Private Was Zone Subnet
   DB_a_zone:
     cidr: 172.17.36.0/22
     az_alias: a
     system: DATA
     sequence: 01
+    service : Private DB Zone Subnet
   DB_c_zone:
     cidr: 172.17.40.0/22
     az_alias: c
     system: DATA
     sequence: 01
+    service : Private DB Zone Subnet
 
 vpc_nats:
   nat-01:
@@ -73,6 +89,7 @@ vpc_routing_tables:
       - "{{ subnets.web_alb_a_zone.id | default('')}}"
       - "{{ subnets.web_alb_c_zone.id | default('')}}"
       - "{{ subnets.mgmt_a_zone.id | default('')}}"
+    service : Public RouteTable
   private:
     private01:
       number: 01
@@ -81,6 +98,7 @@ vpc_routing_tables:
         - "{{ subnets.web_server_a_zone.id | default('')}}"
         - "{{ subnets.was_server_a_zone.id | default('')}}"
       nat: nat-01
+      service : Nat Route Table
     private02:
       number: 02
       domain: nat
@@ -88,32 +106,41 @@ vpc_routing_tables:
         - "{{ subnets.web_server_c_zone.id | default('')}}"
         - "{{ subnets.was_server_c_zone.id | default('')}}"
       nat: nat-02
+      service : Nat Route Table
     private03:
       number: 01
       domain: prv
       subnets:
         - "{{ subnets.was_alb_a_zone.id | default('')}}"
         - "{{ subnets.was_alb_c_zone.id | default('')}}"
+      service : Private Route Table
     private04:
       number: 01
       domain: data
       subnets:
         - "{{ subnets.DB_a_zone.id | default('')}}"
         - "{{ subnets.DB_c_zone.id | default('')}}"
+      service : Private Route Table
 
 ec2_security_groups_metadata:
   - name: mgmt
-    description: MGMT Rule
+    description: Mgmt Security Groups
+    service : Mgmt Security Groups
   - name: webalb
-    description: Web ALB Rule
+    description: Webalb Security Groups
+    service : Webalb Security Groups
   - name: wasalb
-    description: WAS ALB Rule
+    description: Wasalb Security Groups
+    service : Wasalb Security Groups
   - name: web
-    description: WEB Rule
+    description: Web Security Groups
+    service : Web Security Groups
   - name: was
-    description: WAS Rule
+    description: Was Security Groups
+    service : Was Security Groups
   - name: data
-    description: Data Service Rule
+    description: Data Security Groups
+    service : Data Security Groups
 
 
 ec2_security_groups_rules:
@@ -183,6 +210,11 @@ ec2_security_groups_rules:
         group_id: "{{ security_groups.wasalb.owner_id  }}/{{ security_groups.wasalb.group_id  }}/{{ security_groups.wasalb.group_name}}"
         ports:
           - 8080
+      - proto: tcp
+        cidr_ip: 0.0.0.0/0
+        ports:
+          - 443
+          - 80
   was:
     rules:
       - proto: tcp
@@ -213,14 +245,30 @@ ec2_security_groups_rules:
 
 aws_iam_role:
   - name: aplz-ec2-basic-web
+    managed_polices:
+      - ReadOnlyAccess
   - name: aplz-ec2-basic-was
   - name: aplz-ec2-basic-mgmt
+
+aws_iam_policy:
+  - iam_name: aplz-ec2-basic-web
+    policy_name: aplz-ec2-basic-web
+    policy_file_name: s3_policy.json
+    iam_type: role
+  - iam_name: aplz-ec2-basic-was
+    policy_name: aplz-ec2-basic-was
+    policy_file_name: s3_policy.json
+    iam_type: role
+  - iam_name: aplz-ec2-basic-mgmt
+    policy_name: aplz-ec2-basic-mgmt
+    policy_file_name: s3_policy.json
+    iam_type: role
 
 ec2_bastion:
   type: t3.micro
   iam_profile: aplz-ec2-basic-mgmt
   subnet: mgmt_a_zone
-  image: ami-0094965d55b3bb1ff   # Amazon Linux 2 AMI
+  image: ami-0c6bfbd045ac8b8ec   # Amazon Linux 2 AMI
   key_name: amore-poc-bastion
   instance_profile: aplz-ec2-basic-mgmt
   security_groups:
@@ -234,7 +282,7 @@ autoscaling:
       security_groups:
         - "{{ security_groups.web.group_id | default('') }}"
       key_name: amore-poc-web
-      image: ami-0c6bfbd045ac8b8ec # Golden Image 변경 필요
+      image: ami-06ba0dad0df06956b
       instance_profile_name: aplz-ec2-basic-web
     was:
       name: was
@@ -242,7 +290,7 @@ autoscaling:
       security_groups:
         - "{{ security_groups.was.group_id | default('') }}"
       key_name: amore-poc-was
-      image: ami-060043fbfcc808337 # Golden Image 변경 필요
+      image: ami-060043fbfcc808337
       instance_profile_name: aplz-ec2-basic-was
   autoscaling_groups:
     web:
@@ -261,6 +309,13 @@ autoscaling:
         - "{{ target_groups.web_alb.http.target_group_arn  | default([])  }}"
       tags:
         - Name: "{{ default_prefix }}{{ REGIONS[default_region] }}-{{ default_account_alias }}-{{default_platform}}-WEB"
+        - Company: "{{default_prefix}}"
+        - Country: KR
+        - Service: web server
+        - BackupYN: N
+        - XsuiteIgnore: Null (capam)
+        - Stage: "{{default_stage}}"
+        - System : web server
         - propagate_at_launch: yes
     was:
       name: was
@@ -275,6 +330,13 @@ autoscaling:
       tags:
         - Name: "{{ default_prefix }}{{ REGIONS[default_region] }}-{{ default_account_alias }}-{{default_platform}}-WAS"
         - deploy : codedeploy
+        - Company: "{{default_prefix}}"
+        - Country: KR
+        - Service: was server
+        - BackupYN: N
+        - XsuiteIgnore: Null (capam)
+        - Stage: "{{default_stage}}"
+        - System : was server
         - propagate_at_launch: yes
       load_balancers:
         - "{{ application_lb.was_alb.load_balancer_name| default([]) }}"
@@ -296,6 +358,7 @@ alb:
         DefaultActions:
           - Type: forward
             TargetGroupName: "{{ target_groups.web_alb.http.target_group_name  | default([])  }}"
+    service: Web Alb
   was_alb:
     name: WAS
     system: PRI1
@@ -311,6 +374,7 @@ alb:
         DefaultActions:
           - Type: forward
             TargetGroupName:  "{{ target_groups.was_alb.http.target_group_name  | default([])  }}"
+    service: Was Alb
 
 target_group:
   - name: http
@@ -320,6 +384,7 @@ target_group:
       path: /index.html
       code: 200
     alb: web_alb
+    service: WEB ALB Targetgroup
   - name: http
     port : 8080
     protocol: http
@@ -327,11 +392,12 @@ target_group:
       path: /app/index.jsp
       code: 200
     alb: was_alb
+    service: WAS ALB Targetgroup
 
 
 rds_metadata:
   instances:
-    - name: APLZPG
+    - name: PG
       num: 01
       db_engine: postgres
       engine_version: 10.6
@@ -339,22 +405,25 @@ rds_metadata:
       size: 30
       username: rds_admin
       password: Pa55w0rd
-      subnet_group: aplzpg
+      subnet_group: pgsg
       security_groups:
         - "{{ security_groups.data.group_id | default('')}}"
   subnet_group:
-    aplzpg:
-      name: aplzpg
+    pgsg:
+      name: rdssg
       num: 01
-      description: "Subnet Group For APLZPG"
+      description: "Subnet Group For PG"
       subnets:
         - "{{ subnets.DB_a_zone.id | default('')}}"
         - "{{ subnets.DB_c_zone.id | default('')}}"
 
 s3_bucket_metadata:
-  - upload
-  - static
-  - log
+  - name: upload
+    service: File Upload S3 Bucket
+  - name: static
+    service: Static File S3 Bucket
+  - name: log
+    service: Log S3 Bucket
 s3_bucket_logging_metadata:
   upload:
     target_bucket: log
@@ -362,3 +431,47 @@ s3_bucket_logging_metadata:
   static:
     target_bucket: log
     target_prefix: s3
+
+elasticache_metadata:
+  instances:
+    - name: REDIS
+      num: 01
+      engine: redis
+      engine_version: 6.x
+      node_type: cache.t3.small
+      num_nodes: 3
+      cache_port: 6379
+      subnet_group: redissg
+      cache_security_groups: "{{ security_groups.data.group_id | default('')}}"
+  subnet_group:
+    redissg:
+      name: redissg
+      num: 01
+      description: "Subnet Group For APLZPG"
+      subnets:
+        - "{{ subnets.DB_a_zone.id | default('')}}"
+        - "{{ subnets.DB_c_zone.id | default('')}}"
+
+codedeploy_metadata:
+  iam_role:
+    was_role:
+      name: was-role
+      managed_polices:
+        - AWSCodeDeployRole
+  iam_policy:
+    was_role:
+      iam_role_name: was_role
+      policy_name: AWSCodeDeployRole
+      iam_type: role
+  application:
+    - name: codedeploy
+      num: 02
+      deployment_group:
+        name: deploygroup
+        num: 02
+        asg_group: "{{ autoscaling_groups.was.auto_scaling_group_name | default('')}}"
+        config_name: CodeDeployDefault.AllAtOnce
+        iam_name: was_role
+
+
+

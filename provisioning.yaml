@@ -17,8 +17,10 @@
     - 9_EC2
     - 10_TargetGroup
     - 11_ALB
-    - 12_Autoscaling
-    - 13_RDS
-    - 14_S3
+    - 13_Autoscaling
+    - 15_CodeDeploy
+    - 14_RDS
+    - 15_S3
+    - 16_Elasticache
 
 

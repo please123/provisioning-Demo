@@ -7,10 +7,12 @@
     - group_vars/metadata.yml
   tasks:
     - include_role:
-        name: '{{item}}'
+        name: '{{role_name}}'
         tasks_from: absent
       loop:
-        - 12_Autoscaling
+        - 16_Elasticache
+        - 14_RDS
+        - 13_Autoscaling
         - 11_ALB
         - 10_TargetGroup
         - 9_EC2
@@ -18,4 +20,6 @@
         - 7_SecurityGroup
         - 6_NACL
         - 5_RoutingTable
+      loop_control:
+        loop_var: role_name
 

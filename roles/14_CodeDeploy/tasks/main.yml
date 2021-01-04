@@ -1,0 +1,44 @@
+#- debug:
+#    msg: "{{ item }}"
+#  with_dict: "{{codedeploy_metadata}}"
+
+- name: "Create IAM Role For CodeDeploy"
+  iam_role:
+    name: "{{default_platform}}-codedeploy-{{item.value.name}}"
+    region: "{{ default_region }}"
+    assume_role_policy_document: "{{ lookup( 'file', 'template/code_deploy_role.json') }}"
+    managed_policy: "{{ item.value.managed_polices}}"
+  with_dict: "{{codedeploy_metadata.iam_role}}"
+  register: create_iam_role
+
+- name: "Gathering IAM Role Information"
+  set_fact:
+    iam_roles: "{{ iam_roles | default({}) |
+  combine({ item.item.key: item })
+  }}"
+  loop: "{{ create_iam_role.results }}"
+
+#- name: "Check Already Exists Application"
+#  command: aws deploy list-applications
+#  loop: "{{codedeploy_metadata.application}}"
+#  register: get_list_applications
+#
+#- name: "Set Fact AWS CodeDeploy Exists Application"
+#  set_fact:
+#    list_applications: "{{ item.stdout | from_json }}"
+#  loop: "{{ get_list_applications.results }}"
+
+- name: "Create CodeDeploy Application"
+  command: aws deploy create-application --application-name "{{default_prefix|lower}}{{ REGIONS[default_region] | lower }}-{{ default_account_alias|lower}}-{{default_platform|lower}}-{{item.name}}{{item.num}}"
+  loop: "{{codedeploy_metadata.application}}"
+  ignore_errors: yes
+
+- name: "Create CodeDeploy Deploy Group"
+  command: aws deploy create-deployment-group \
+    --application-name "{{default_prefix|lower}}{{ REGIONS[default_region] | lower }}-{{ default_account_alias|lower}}-{{default_platform|lower}}-{{item.name}}{{item.num}}" \
+    --auto-scaling-groups "{{item.deployment_group.asg_group}}" \
+    --deployment-config-name CodeDeployDefault.AllAtOnce \
+    --deployment-group-name "{{default_prefix|lower}}{{ REGIONS[default_region] | lower }}-{{ default_account_alias|lower}}-{{default_platform|lower}}-{{item.deployment_group.name}}{{item.deployment_group.num}}" \
+    --service-role-arn "{{iam_roles[item.deployment_group.iam_name].arn}}"
+  loop: "{{codedeploy_metadata.application}}"
+  ignore_errors: yes

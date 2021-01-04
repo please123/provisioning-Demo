@@ -1,0 +1,5 @@
+- name: Create Internet Gateway
+  ec2_vpc_igw:
+    vpc_id: "{{ vpc.id }}"
+    region: "{{ default_region }}"
+    state: absent

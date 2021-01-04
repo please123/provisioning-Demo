@@ -1,0 +1,32 @@
+---
+- name: "Create Elasticache Subnet Group"
+  elasticache_subnet_group:
+    state: present
+    name: "{{ default_prefix | lower }}{{ REGIONS[default_region] | lower }}-{{ default_account_alias | lower }}-{{default_platform | lower}}-{{item.value.name|lower}}"
+    description: "{{ item.value.description }}"
+    region: "{{ default_region }}"
+    subnets: "{{ item.value.subnets }}"
+  with_dict: "{{ elasticache_metadata.subnet_group}}"
+  register: create_elasticache_subnet_group
+
+- name: "Gathering Elasticache SubnetGroup Information"
+  set_fact:
+    elasticache_subnet_group: "{{ elasticache_subnet_group | default({}) |
+    combine({ item.item.key : item.invocation.module_args }) }}"
+  loop: "{{ create_elasticache_subnet_group.results }}"
+
+- name: "Create Elasticache Instance"
+  elasticache:
+    name:                    "{{ [default_account_alias, default_platform , item.name] | join('-') }}"
+    state:                   present
+    region:                  "{{ default_region }}"
+    engine:                  "{{ item.engine | default('memcached') }}"
+    cache_engine_version:    "{{ item.engine_version | default('1.4.14') }}"
+    node_type:               "{{item.node_type}}"
+    num_nodes:               1
+    cache_subnet_group:      "{{ elasticache_subnet_group[item.subnet_group].name }}"
+    security_group_ids:      "{{item.cache_security_groups}}"
+    wait: false
+  loop: "{{ elasticache_metadata.instances }}"
+
+

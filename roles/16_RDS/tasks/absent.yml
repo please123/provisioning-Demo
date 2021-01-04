@@ -1,0 +1,16 @@
+---
+- name: "Delete  RDS Instance"
+  rds:
+    command: delete
+    instance_name: "{{ default_prefix | lower}}{{ REGIONS[default_region] | lower }}-{{ default_account_alias | lower }}-{{default_platform | lower }}-{{item.name | lower}}{{item.num}}"
+    region: "{{ default_region }}"
+  loop: "{{ rds_metadata.instances }}"
+
+
+- name: "Create RDS Subnet Group"
+  rds_subnet_group:
+    state: absent
+    name: "{{ default_prefix | lower }}{{ REGIONS[default_region] | lower }}-{{ default_account_alias | lower }}-{{default_platform | lower}}-{{item.value.name|lower}}"
+    region: "{{ default_region }}"
+  with_dict: "{{ rds_metadata.subnet_group}}"
+

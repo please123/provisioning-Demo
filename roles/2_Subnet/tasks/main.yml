@@ -10,6 +10,10 @@
     region: "{{default_region}}"
     tags:
       Name: "{{default_prefix}}{{REGIONS[default_region]}}-{{default_account_alias}}-{{item.value.az_alias}}-{{item.value.system}}-{{item.value.sequence}}"
+      Company: "{{default_prefix}}"
+      Country: KR
+      Service: "{{item.value.service}}"
+      Stage: "{{default_stage}}"
   with_dict: "{{ vpc_subnets_metadata }}"
   register: create_vpc_subnets
 

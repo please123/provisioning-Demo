@@ -4,6 +4,10 @@
     region: "{{ default_region }}"
     tags:
       Name: "{{ default_prefix }}{{ REGIONS[default_region] }}-{{ default_account_alias }}-igw"
+      Company: "{{default_prefix}}"
+      Country: KR
+      Service: Internet Gateway
+      Stage: "{{default_stage}}"
   register: create_igw
 
 - name: "Gathering Internet Gateway Information Information"

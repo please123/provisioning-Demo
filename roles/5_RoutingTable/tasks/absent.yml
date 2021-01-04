@@ -4,13 +4,14 @@
     region: "{{default_region}}"
     tags:
       Name: "{{default_prefix}}{{REGIONS[default_region]}}-{{default_account_alias}}-{{default_platform}}-{{ vpc_routing_tables.public.number }}"
+    vpc_id: "{{vpc.id}}"
     state: absent
-
 
 - name: "Delete Private RoutingTable Rule"
   ec2_vpc_route_table:
     region: "{{default_region}}"
     tags:
-      Name: "{{default_prefix}}{{REGIONS[default_region]}}-{{default_account_alias}}-{{default_platform}}-{{ item.value.domain}}-{{ item.value.number}}"
+      Name: "{{default_prefix}}{{REGIONS[default_region]}}-{{default_account_alias}}-{{default_platform}}-{{item.value.domain}}-{{ item.value.number}}"
+    vpc_id: "{{vpc.id}}"
     state: absent
   with_dict: "{{ vpc_routing_tables.private }}"

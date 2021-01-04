@@ -10,4 +10,13 @@
     network:
       assign_public_ip: true
     security_groups: "{{ec2_bastion.security_groups}}"
-    wait: true
+    tags:
+      Name: "{{ default_prefix }}{{ REGIONS[default_region] }}-{{ default_account_alias }}-a-{{default_platform}}-bastion"
+      Company: "{{default_prefix}}"
+      Country: KR
+      Service: Management server
+      BackupYN: N
+      XsuiteIgnore: Null (capam)
+      System: management server
+      Stage: "{{default_stage}}"
+    wait: no

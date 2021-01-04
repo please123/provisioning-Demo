@@ -1,0 +1,26 @@
+---
+- name: "Gather information Base WEB Image instance"
+  ec2_instance_info:
+    region: "{{default_region}}"
+    filters:
+      "tag:Name": "{{ default_prefix }}{{ REGIONS[default_region] }}-{{ default_account_alias }}-{{default_platform}}-WEB"
+      instance-state-name: [ "running", "stopped" ]
+  register: create_ec2_instance
+
+
+- name: "Create AMI Image"
+  ec2_ami:
+    instance_id: "{{create_ec2_instance.instances[0].instance_id}}"
+    wait: yes
+    name: "{{ default_prefix }}{{ REGIONS[default_region] }}-{{ default_account_alias }}-{{default_platform}}-WEB"
+    tags:
+      Name: "{{ default_prefix }}{{ REGIONS[default_region] }}-{{ default_account_alias }}-{{default_platform}}-WEB"
+      region: "{{ default_region }}"
+  register: create_ami_image
+
+- name: "Gathering Launch Configuration Information"
+  when:
+    - create_ami_image is defined
+    - create_ami_image.image_id
+  set_fact:
+    create_web_ami_id: "{{ create_ami_image.image_id }}"

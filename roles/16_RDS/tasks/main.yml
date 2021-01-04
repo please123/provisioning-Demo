@@ -2,7 +2,7 @@
 - name: "Create RDS Subnet Group"
   rds_subnet_group:
     state: present
-    name: "{{ item.value.name }}"
+    name: "{{ default_prefix | lower }}{{ REGIONS[default_region] | lower }}-{{ default_account_alias | lower }}-{{default_platform | lower}}-{{item.value.name|lower}}"
     description: "{{ item.value.description }}"
     region: "{{ default_region }}"
     subnets: "{{ item.value.subnets }}"
@@ -12,14 +12,14 @@
 - name: "Gathering RDS SubnetGroup Information"
   set_fact:
     rds_subnet_group: "{{ rds_subnet_group | default({}) |
-    combine({ item.subnet_group.name : item.subnet_group })
+    combine({ item.item.key : item.subnet_group })
     }}"
   loop: "{{ create_rds_subnet_group.results }}"
 
 - name: "Create RDS Instance"
   rds:
     command: create
-    instance_name: "{{ default_prefix }}{{ REGIONS[default_region] }}-{{ default_account_alias }}-{{default_platform}}-{{item.name}}"
+    instance_name: "{{ default_prefix | lower}}{{ REGIONS[default_region] | lower }}-{{ default_account_alias | lower }}-{{default_platform | lower }}-{{item.name | lower}}{{item.num}}"
     db_engine: "{{ item.db_engine | default('mysql') }}"
     engine_version: "{{ item.engine_version | default('5.5.57')}}"
     size: "{{item.size}}"
@@ -29,6 +29,14 @@
     username: "{{ item.username}}"
     password: "{{ item.password}}"
     region: "{{ default_region }}"
+    tags:
+      Name: "{{ default_prefix | lower}}{{ REGIONS[default_region] | lower }}-{{ default_account_alias | lower }}-{{default_platform | lower }}-{{item.name | lower}}{{item.num}}"
+      Company: "{{default_prefix}}"
+      Country: KR
+      Service: DB
+      XsuiteIgnore: Null-capam
+      Stage: "{{default_stage}}"
+      System: DB
   loop: "{{ rds_metadata.instances }}"
 
 

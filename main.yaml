@@ -4,14 +4,23 @@
   gather_facts: False
   vars_files:
     - group_vars/default.yml
-    - group_vars/provisioning.yml
-    - group_vars/constant.yml
+    - group_vars/metadata.yml
   roles:
-    - vpc
-    - securitygroup
-    - iam
-    - ec2
-    - alb
-    - autoscaling
-#    - rds
-    - s3
+    - 1_Vpc
+    - 2_Subnet
+    - 3_InternetGateway
+    - 4_NatGateway
+    - 5_RoutingTable
+    - 6_NACL
+    - 7_SecurityGroup
+    - 8_IAM
+    - 9_EC2
+    - 10_TargetGroup
+    - 11_ALB
+    - 13_Autoscaling
+    - 14_CodeDeploy
+    - 15_S3
+    - 16_RDS
+    - 17_Elasticache
+
+

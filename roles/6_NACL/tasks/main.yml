@@ -8,4 +8,10 @@
       - [100, 'all', 'allow', '0.0.0.0/0', null, null, null, null]
     egress:
       - [100, 'all', 'allow', '0.0.0.0/0', null, null, null, null]
+    tags:
+      Name: "{{default_prefix}}{{REGIONS[default_region]}}-{{default_account_alias}}-nacl-01"
+      Company: "{{default_prefix}}"
+      Country: KR
+      Service: Network ACL
+      Stage: "{{default_stage}}"
     state: 'present'

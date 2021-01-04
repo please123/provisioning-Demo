@@ -25,5 +25,11 @@
     rules: "{{ ec2_security_groups_rules[item.key].rules| default([]) }}"
     rules_egress: "{{ ec2_security_groups_rules[item.key].rules_egress | default([]) }}"
     region: "{{default_region}}"
+    tags:
+      Name: "{{ item.value.group_name }}"
+      Company: "{{default_prefix}}"
+      Country: KR
+      Service: "{{item.value.item.service}}"
+      Stage: "{{default_stage}}"
   with_dict: "{{ security_groups }}"
 

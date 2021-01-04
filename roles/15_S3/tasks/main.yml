@@ -2,9 +2,15 @@
 # Create a bucket, add a policy from a file, enable requester pays, enable versioning and tag
 - name: "Create S3 Bucket"
   s3_bucket:
-    name: "{{ default_account | lower}}-{{ default_stage | lower}}-{{item | lower}}-{{default_platform | lower}}"
+    name: "{{ default_account | lower}}-{{ default_stage | lower}}-{{item.name | lower}}-{{default_platform | lower}}"
     versioning: yes
     region: "{{ default_region }}"
+    tags:
+      Name: "{{ default_account | lower}}-{{ default_stage | lower}}-{{item.name | lower}}-{{default_platform | lower}}"
+      Company: "{{default_prefix}}"
+      Country: KR
+      Service: "{{item.service}}"
+      Stage: "{{default_stage}}"
   loop: "{{ s3_bucket_metadata }}"
   register: create_bucket
   ignore_errors: yes
@@ -12,7 +18,7 @@
 - name: "Gathering Bucket Information"
   set_fact:
     s3_buckets: "{{ s3_buckets | default({}) |
-    combine({ item.item : item.name })
+    combine({ item.item.name : item.name })
     }}"
   loop: "{{ create_bucket.results }}"
   ignore_errors: yes
