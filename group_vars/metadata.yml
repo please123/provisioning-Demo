@@ -230,7 +230,7 @@ autoscaling:
   launch_configurations:
     web:
       name: web
-      type: t3.micro
+      type: t3.medium
       security_groups:
         - "{{ security_groups.web.group_id  }}"
       key_name: amore-poc-web
@@ -238,7 +238,7 @@ autoscaling:
       instance_profile_name: aplz-ec2-basic-web
     was:
       name: was
-      type: t3.micro
+      type: t3.large
       security_groups:
         - "{{ security_groups.was.group_id  }}"
       key_name: amore-poc-was
