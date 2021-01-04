@@ -14,7 +14,7 @@
   register: create_security_groups_default
 
 - name: "Create Security Group"
-  when: item.use_default is undefined or item.use_default | bool
+  when: item.use_default is undefined or not item.use_default
   ec2_group:
     name: "{{default_prefix}}{{REGIONS[default_region]}}-{{default_account_alias}}-{{default_platform}}-{{item.name}}"
     description: "{{item.description}}"
