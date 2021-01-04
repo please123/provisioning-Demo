@@ -6,6 +6,7 @@
     security_groups: "{{ item.value.groups }}"
     subnets: "{{ item.value.subnets }}"
     listeners: "{{ item.value.listeners}}"
+    scheme: "{{item.value.scheme | default('internet-facing')}}"
     region: "{{default_region}}"
   with_dict: "{{ alb }}"
   register: create_application_lb

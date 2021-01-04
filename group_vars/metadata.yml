@@ -299,6 +299,7 @@ alb:
   was_alb:
     name: WAS
     system: PRI1
+    scheme: internal
     subnets:
       - "{{ subnets.was_alb_a_zone.id}}"
       - "{{ subnets.was_alb_c_zone.id}}"
