@@ -2,5 +2,6 @@
 - name: "Delete Application Load Balancer"
   elb_application_lb:
     name: "{{ default_account_alias }}-{{default_platform}}-{{item.value.system}}-ALB-{{item.value.name}}"
+    region: "{{default_region}}"
     state: absent
   with_dict: "{{ alb }}"
