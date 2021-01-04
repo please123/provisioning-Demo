@@ -1,4 +1,8 @@
 ---
+- name: "Finish Provisioning"
+  debug:
+    msg: "{{is_absent}}"
+
 - include: present.yml
   when: is_absent is undefined or not is_absent
 - include: absent.yml

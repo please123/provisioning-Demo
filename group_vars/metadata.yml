@@ -232,7 +232,7 @@ autoscaling:
       name: web
       type: t3.medium
       security_groups:
-        - "{{ security_groups.web.group_id  }}"
+        - "{{ security_groups.web.group_id | default('') }}"
       key_name: amore-poc-web
       image: ami-0c6bfbd045ac8b8ec # Golden Image 변경 필요
       instance_profile_name: aplz-ec2-basic-web
@@ -240,7 +240,7 @@ autoscaling:
       name: was
       type: t3.large
       security_groups:
-        - "{{ security_groups.was.group_id  }}"
+        - "{{ security_groups.was.group_id | default('') }}"
       key_name: amore-poc-was
       image: ami-060043fbfcc808337 # Golden Image 변경 필요
       instance_profile_name: aplz-ec2-basic-was
@@ -249,8 +249,8 @@ autoscaling:
       name: web
       launch_config_name: web
       subnets:
-        - "{{ subnets.web_server_a_zone.id }}"
-        - "{{ subnets.web_server_c_zone.id }}"
+        - "{{ subnets.web_server_a_zone.id | default('') }}"
+        - "{{ subnets.web_server_c_zone.id | default('')}}"
       capacity:
         desired: 2
         min: 2
@@ -266,8 +266,8 @@ autoscaling:
       name: was
       launch_config_name: was
       subnets:
-        - "{{ subnets.was_server_a_zone.id }}"
-        - "{{ subnets.was_server_c_zone.id }}"
+        - "{{ subnets.was_server_a_zone.id | default('')}}"
+        - "{{ subnets.was_server_c_zone.id | default('')}}"
       capacity:
         desired: 2
         min: 2
