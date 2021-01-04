@@ -4,9 +4,10 @@
     name: "{{default_prefix}}{{REGIONS[default_region]}}-{{default_account_alias}}-{{default_platform}}-{{item.name}}"
     description: "{{item.description}}"
     region: "{{default_region}}"
-    vpc_id: ""
     tags:
       Name: "{{default_prefix}}{{REGIONS[default_region]}}-{{default_account_alias}}-{{default_platform}}-{{item.name}}"
+    purge_rules: true
+    purge_rules_egress: true
   loop: "{{ ec2_security_groups_metadata }}"
 
 - name: "Delete Security Group"
