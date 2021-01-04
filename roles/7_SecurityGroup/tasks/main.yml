@@ -1,5 +1,29 @@
 ---
-- include: present.yml
-  when: is_absent is undefined or not is_absent
-- include: absent.yml
-  when: is_absent is defined or is_absent | bool
+- name: "Create Security Group"
+  ec2_group:
+    name: "{{default_prefix}}{{REGIONS[default_region]}}-{{default_account_alias}}-{{default_platform}}-{{item.name}}"
+    description: "{{item.description}}"
+    vpc_id: "{{vpc.id}}"
+    region: "{{default_region}}"
+    tags:
+      Name: "{{default_prefix}}{{REGIONS[default_region]}}-{{default_account_alias}}-{{default_platform}}-{{item.name}}"
+  loop: "{{ ec2_security_groups_metadata }}"
+  register: create_security_groups
+
+- name: "Gathering Security Group Information"
+  set_fact:
+    security_groups: "{{ security_groups | default({}) |
+    combine({ item.item.name: item })
+    }}"
+  loop: "{{ create_security_groups.results }}"
+
+- name: "Set Up Security Group Rule"
+  ec2_group:
+    name: "{{ item.value.group_name }}"
+    description: "{{ item.value.item.description }}"
+    vpc_id: "{{ vpc.id }}"
+    rules: "{{ ec2_security_groups_rules[item.key].rules| default([]) }}"
+    rules_egress: "{{ ec2_security_groups_rules[item.key].rules_egress | default([]) }}"
+    region: "{{default_region}}"
+  with_dict: "{{ security_groups }}"
+

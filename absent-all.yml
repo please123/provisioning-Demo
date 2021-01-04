@@ -5,14 +5,17 @@
   vars_files:
     - group_vars/default.yml
     - group_vars/metadata.yml
-  vars:
-    is_absent: true
-  roles:
-    - 12_Autoscaling
-    - 11_ALB
-    - 10_TargetGroup
-    - 9_EC2
-    - 8_IAM
-    - 7_SecurityGroup
-    - 6_NACL
-    - 5_RoutingTable
+  tasks:
+    - import_role:
+        name: myrole
+        tasks_from: absent
+      loop:
+        - 12_Autoscaling
+        - 11_ALB
+        - 10_TargetGroup
+        - 9_EC2
+        - 8_IAM
+        - 7_SecurityGroup
+        - 6_NACL
+        - 5_RoutingTable
+
