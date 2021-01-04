@@ -193,12 +193,12 @@ ec2_security_groups_rules:
   data:
     rules:
       - proto: tcp
-        group_id: "{{ security_groups.data.group_id  }}"
+        group_id: "{{ security_groups.was.group_id  }}"
         ports:
           - 5543
           - 6379
       - proto: tcp
-        group_id: "{{ security_groups.was.group_id  }}"
+        group_id: "{{ security_groups.mgmt.group_id  }}"
         ports:
           - 5543
           - 6379
@@ -249,6 +249,9 @@ autoscaling:
         - "{{ application_lb.web_alb.load_balancer_name| default([]) }}"
       target_groups:
         - "{{ target_groups.web_alb.http.target_group_arn  | default([])  }}"
+      tags:
+        - Name: "{{ default_prefix }}{{ REGIONS[default_region] }}-{{ default_account_alias }}-{{default_platform}}-WEB"
+        - propagate_at_launch: yes
     was:
       name: was
       launch_config_name: was
@@ -260,6 +263,7 @@ autoscaling:
         min: 2
         max: 4
       tags:
+        - Name: "{{ default_prefix }}{{ REGIONS[default_region] }}-{{ default_account_alias }}-{{default_platform}}-WEB"
         - deploy : codedeploy
         - propagate_at_launch: yes
       load_balancers:
@@ -272,8 +276,8 @@ alb:
     name: WEB
     system: PUB1
     subnets:
-      - "{{ subnets.web_server_a_zone.id}}"
-      - "{{ subnets.web_server_c_zone.id}}"
+      - "{{ subnets.web_alb_a_zone.id}}"
+      - "{{ subnets.web_alb_c_zone.id}}"
     groups:
       - "{{ security_groups.webalb.group_id  }}"
     listeners:
