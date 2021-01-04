@@ -6,10 +6,7 @@
     region: "{{default_region}}"
     tags:
       Name: "{{default_prefix}}{{REGIONS[default_region]}}-{{default_account_alias}}-{{default_platform}}-{{item.name}}"
-    purge_rules: true
-    purge_rules_egress: true
   loop: "{{ ec2_security_groups_metadata }}"
-  register: create_security_groups
 
 - name: "Delete Security Group"
   ec2_group:
@@ -18,4 +15,3 @@
     region: "{{default_region}}"
     state: absent
   loop: "{{ ec2_security_groups_metadata }}"
-  register: create_security_groups
