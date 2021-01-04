@@ -4,7 +4,7 @@
     name: "{{default_prefix}}{{REGIONS[default_region]}}-{{default_account_alias}}-{{default_platform}}-{{item.name}}"
     description: "{{item.description}}"
     region: "{{default_region}}"
-    vpc_id: "{{vpc.id}}"
+    vpc_id: ""
     tags:
       Name: "{{default_prefix}}{{REGIONS[default_region]}}-{{default_account_alias}}-{{default_platform}}-{{item.name}}"
   loop: "{{ ec2_security_groups_metadata }}"
