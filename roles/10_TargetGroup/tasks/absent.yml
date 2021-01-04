@@ -4,6 +4,7 @@
     name: "{{ default_account_alias }}-{{default_platform}}-{{alb[item.alb].system}}-ALB-{{alb[item.alb].name}}-{{ item.name }}"
     state: absent
     region: "{{default_region}}"
+    protocol: "{{ item.protocol }}"
+    port: "{{ item.port }}"
+    vpc_id: ""
   loop: "{{ target_group }}"
-  register: create_target_group
-
