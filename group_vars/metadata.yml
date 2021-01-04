@@ -104,7 +104,6 @@ vpc_routing_tables:
 ec2_security_groups_metadata:
   - name: mgmt
     description: MGMT Rule
-    use_default: true
   - name: webalb
     description: Web ALB Rule
   - name: wasalb
@@ -224,6 +223,8 @@ ec2_bastion:
   image: ami-0094965d55b3bb1ff   # Amazon Linux 2 AMI
   key_name: amore-poc-bastion
   instance_profile: aplz-ec2-basic-mgmt
+  security_groups:
+    - "{{ security_groups.mgmt.group_id  }}"
 
 autoscaling:
   launch_configurations:

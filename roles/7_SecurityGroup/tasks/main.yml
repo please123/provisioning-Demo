@@ -1,20 +1,5 @@
 ---
-- name: "Default Security Group Check"
-  when:
-    - item.use_default is defined
-    - item.use_default | bool
-  ec2_group:
-    name: "default"
-    description: "{{item.description}}"
-    vpc_id: "{{vpc.id}}"
-    region: "{{default_region}}"
-    tags:
-      Name: "{{default_prefix}}{{REGIONS[default_region]}}-{{default_account_alias}}-{{default_platform}}-{{item.name}}"
-  loop: "{{ ec2_security_groups_metadata }}"
-  register: create_security_groups_default
-
 - name: "Create Security Group"
-  when: item.use_default is undefined or not item.use_default
   ec2_group:
     name: "{{default_prefix}}{{REGIONS[default_region]}}-{{default_account_alias}}-{{default_platform}}-{{item.name}}"
     description: "{{item.description}}"
@@ -25,18 +10,7 @@
   loop: "{{ ec2_security_groups_metadata }}"
   register: create_security_groups
 
-- name: "Gathering Security Group Information#1"
-  when:
-    - item.item.use_default is defined
-    - item.item.use_default | bool
-  set_fact:
-    security_groups: "{{ security_groups | default({}) |
-    combine({ item.item.name: item })
-    }}"
-  loop: "{{ create_security_groups_default.results }}"
-
-- name: "Gathering Security Group Information#2"
-  when: item.item.use_default is undefined or not item.item.use_default
+- name: "Gathering Security Group Information"
   set_fact:
     security_groups: "{{ security_groups | default({}) |
     combine({ item.item.name: item })
