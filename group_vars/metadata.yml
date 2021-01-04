@@ -213,7 +213,7 @@ ec2_bastion:
   iam_profile: aplz-ec2-basic-mgmt
   subnet: mgmt_a_zone
   image: ami-0094965d55b3bb1ff   # Amazon Linux 2 AMI
-  key_name: amr-poc-key-test
+  key_name: amore-poc-bastion
   instance_profile: aplz-ec2-basic-mgmt
 
 autoscaling:
@@ -223,7 +223,7 @@ autoscaling:
       type: t3.micro
       security_groups:
         - "{{ security_groups.was.group_id  }}"
-      key_name: bespin-amore-poc-web
+      key_name: amore-poc-web
       image: ami-0c6bfbd045ac8b8ec # Golden Image 변경 필요
       instance_profile_name: aplz-ec2-basic-web
     was:
@@ -231,7 +231,7 @@ autoscaling:
       type: t3.micro
       security_groups:
         - "{{ security_groups.web.group_id  }}"
-      key_name: bespin-amore-poc-was
+      key_name: amore-poc-was
       image: ami-060043fbfcc808337 # Golden Image 변경 필요
       instance_profile_name: aplz-ec2-basic-was
   autoscaling_groups:
