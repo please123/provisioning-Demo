@@ -26,6 +26,9 @@
   register: create_security_groups
 
 - name: "Gathering Security Group Information#1"
+  when:
+    - item.item.use_default is defined
+    - item.item.use_default | bool
   set_fact:
     security_groups: "{{ security_groups | default({}) |
     combine({ item.item.name: item })
@@ -33,6 +36,7 @@
   loop: "{{ create_security_groups_default.results }}"
 
 - name: "Gathering Security Group Information#2"
+  when: item.item.use_default is undefined or not item.item.use_default
   set_fact:
     security_groups: "{{ security_groups | default({}) |
     combine({ item.item.name: item })
