@@ -1,16 +1,5 @@
-- name: "Create IAM Role For EC2 Instance Profile"
-  iam_role :
-    name: "{{item.name}}"
-    region: "{{ default_region }}"
-    assume_role_policy_document: "{{ lookup( 'file', 'template/ec2_role.json') }}"
-  loop: "{{aws_iam_role}}"
-
-- name: "Create IAM Policy For Access S3 From Instance"
-  iam_policy  :
-    iam_name: "{{item.name}}"
-    policy_name: "{{item.name}}"
-    iam_type: role
-    region: "{{ default_region }}"
-    policy_json : "{{ lookup( 'file', 'template/s3_policy.json') }}"
-    state: present
-  loop: "{{aws_iam_role}}"
+---
+- include: present.yml
+  when: is_absent is undefined or not is_absent
+- include: absent.yml
+  when: is_absent is defined or is_absent | bool

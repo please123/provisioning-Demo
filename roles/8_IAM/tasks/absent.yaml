@@ -1,0 +1,15 @@
+- name: "Delete IAM Policy For Access S3 From Instance"
+  iam_policy  :
+    iam_name: "{{item.name}}"
+    policy_name: "{{item.name}}"
+    iam_type: role
+    region: "{{ default_region }}"
+    state: absent
+  loop: "{{aws_iam_role}}"
+
+- name: "Delete IAM Role For EC2 Instance Profile"
+  iam_role :
+    name: "{{item.name}}"
+    region: "{{ default_region }}"
+    state: absent
+  loop: "{{aws_iam_role}}"

@@ -1,0 +1,5 @@
+---
+- name: "Delete EC2 Bastion Instance"
+  ec2_instance:
+    name: "{{ default_prefix }}{{ REGIONS[default_region] }}-{{ default_account_alias }}-a-{{default_platform}}-bastion"
+    state: absent

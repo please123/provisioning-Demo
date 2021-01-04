@@ -1,21 +1,5 @@
 ---
-- name: "Create Target Group For Application LoadBalancer"
-  elb_target_group:
-    name: "{{ default_account_alias }}-{{default_platform}}-{{alb[item.alb].system}}-ALB-{{alb[item.alb].name}}-{{ item.name }}"
-    protocol: "{{ item.protocol }}"
-    port: "{{ item.port }}"
-    vpc_id: "{{ vpc.id }}"
-    health_check_protocol: http
-    health_check_path: "{{ item.health_check.path }}"
-    successful_response_codes: "{{ item.health_check.code | default(200) }}"
-    state: present
-    region: "{{default_region}}"
-  loop: "{{ target_group }}"
-  register: create_target_group
-
-- name: "Gathering Target Group Information"
-  set_fact:
-    target_groups: "{{ target_groups | default({}) |
-    combine({ item.item.alb : { item.item.name : item }})
-    }}"
-  loop: "{{ create_target_group.results }}"
+- include: present.yml
+  when: is_absent is undefined or not is_absent
+- include: absent.yml
+  when: is_absent is defined or is_absent | bool
