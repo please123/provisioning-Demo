@@ -1,38 +1,5 @@
 ---
-- name: "Create Launch Configuration"
-  ec2_lc:
-    name: "{{ default_prefix }}{{ REGIONS[default_region] }}-{{ default_account_alias }}-{{item.value.name}}-lc"
-    image_id: "{{ item.value.image}}"
-    key_name: "{{ item.value.key_name}}"
-    region: "{{default_region}}"
-    security_groups: "{{item.value.security_groups}}"
-    instance_type: "{{ item.value.type}}"
-    instance_profile_name: "{{item.value.instance_profile_name}}"
-    assign_public_ip: no
-  with_dict: "{{ autoscaling.launch_configurations}}"
-  register: create_launch_configuration
-
-
-- name: "Gathering Launch Configuration Information"
-  set_fact:
-    launch_configurations: "{{ launch_configurations | default({}) |
-    combine({ item.item.key: item })
-    }}"
-  loop: "{{ create_launch_configuration.results }}"
-
-- name: "Create Auto Scaling Group"
-  ec2_asg:
-    name: "{{ default_prefix }}{{ REGIONS[default_region] }}-{{ default_account_alias }}-{{item.value.name}}-asg"
-    launch_config_name: "{{ launch_configurations[item.key].name}}"
-    health_check_period: 60
-    health_check_type: EC2
-    min_size: "{{item.value.capacity.min}}"
-    max_size: "{{item.value.capacity.max}}"
-    desired_capacity: "{{item.value.capacity.desired}}"
-    vpc_zone_identifier: "{{item.value.subnets}}"
-    region: "{{default_region}}"
-    target_group_arns : "{{item.value.target_groups}}"
-    tags: "{{item.value.tags | default([])}}"
-    wait_for_instances: FALSE
-  register: create_autosclaing_group
-  with_dict: "{{ autoscaling.autoscaling_groups }}"
+- include: present.yml
+  when: is_absent is undefined or not is_absent
+- include: absent.yml
+  when: is_absent is defined or is_absent | bool

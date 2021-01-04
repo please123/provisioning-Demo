@@ -1,0 +1,9 @@
+---
+- name: "Delete Target Group"
+  elb_target_group:
+    name: "{{ default_account_alias }}-{{default_platform}}-{{alb[item.alb].system}}-ALB-{{alb[item.alb].name}}-{{ item.name }}"
+    state: absent
+    region: "{{default_region}}"
+  loop: "{{ target_group }}"
+  register: create_target_group
+

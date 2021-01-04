@@ -1,0 +1,19 @@
+---
+- name: "Create Application Load Balancer"
+  elb_application_lb:
+    name: "{{ default_account_alias }}-{{default_platform}}-{{item.value.system}}-ALB-{{item.value.name}}"
+    state: present
+    security_groups: "{{ item.value.groups }}"
+    subnets: "{{ item.value.subnets }}"
+    listeners: "{{ item.value.listeners}}"
+    scheme: "{{item.value.scheme | default('internet-facing')}}"
+    region: "{{default_region}}"
+  with_dict: "{{ alb }}"
+  register: create_application_lb
+
+- name: "Gathering Application LoadBalancer Information"
+  set_fact:
+    application_lb: "{{ application_lb | default({}) |
+    combine({ item.item.key : item })
+    }}"
+  loop: "{{ create_application_lb.results }}"

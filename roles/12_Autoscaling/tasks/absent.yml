@@ -1,0 +1,14 @@
+---
+- name: "Delete Auto Scaling Group"
+  ec2_asg:
+    name: "{{ default_prefix }}{{ REGIONS[default_region] }}-{{ default_account_alias }}-{{item.value.name}}-asg"
+    state: absent
+  with_dict: "{{ autoscaling.autoscaling_groups }}"
+
+- name: "Delete Launch Configuration"
+  ec2_lc:
+    name: "{{ default_prefix }}{{ REGIONS[default_region] }}-{{ default_account_alias }}-{{item.value.name}}-lc"
+    state: absent
+  with_dict: "{{ autoscaling.launch_configurations}}"
+
+
