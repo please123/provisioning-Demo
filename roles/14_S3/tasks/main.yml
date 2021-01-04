@@ -2,7 +2,7 @@
 # Create a bucket, add a policy from a file, enable requester pays, enable versioning and tag
 - name: "Create S3 Bucket"
   s3_bucket:
-    name: "{{ default_account_alias | lower}}-{{item | lower}}-{{default_platform | lower}}"
+    name: "{{ default_account | lower}}-{{ default_stage | lower}}-{{item | lower}}-{{default_platform | lower}}"
     versioning: yes
     region: "{{ default_region }}"
   loop: "{{ s3_bucket_metadata }}"
@@ -20,10 +20,10 @@
 - name: "Enable logging of s3 bucket"
   when: s3_buckets is defined
   s3_logging:
-    name: "{{ default_account_alias | lower }}-{{item.key| lower}}-{{default_platform| lower}}"
+    name: "{{ default_account | lower}}-{{ default_stage | lower}}-{{item.key | lower}}-{{default_platform | lower}}"
     target_bucket: "{{s3_buckets[item.value.target_bucket]}}"
     target_prefix: "{{ item.value.target_prefix}}/{{s3_buckets[item.value.target_bucket]}}"
     state: present
-    region: "{{ default_region }}"
+    region: "{{default_region}}"
   with_dict: "{{s3_bucket_logging_metadata}}"
   ignore_errors: yes

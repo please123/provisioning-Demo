@@ -1,11 +1,12 @@
 ---
 default_prefix: AP
 default_region: ap-northeast-2
-default_account_alias: APKPOC
+default_account: APK
+default_stage: POC
 default_platform: APLZ
 default_state: present
 
-
+default_account_alias: "{{default_account}}{{default_stage}}"
 
 # Constant Variable
 REGIONS:
