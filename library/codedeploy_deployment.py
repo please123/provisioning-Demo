@@ -31,9 +31,10 @@ def main():
       configName=dict(required=True),
       tags=dict(type='dict', aliases=['resource_tags']),
       state=dict(choices=['present', 'absent'], default='present'),
-      autoScalingGroups=dict(required=False),
+      autoScalingGroups=dict(type='list',required=False),
       serviceRoleArn=dict(required=False),
-      deploymentStyle=dict(required=False),
+      deploymentStyle=dict(type='dict',required=False),
+      targetGroupInfoList=dict(type='list')
   )
 
   module = AnsibleAWSModule(
@@ -53,10 +54,10 @@ def main():
   configName = module.params['configName']
   tags = module.params.get('tags')
   state = module.params.get('state')
-  autoScalingGroups = module.params.get('autoScalingGroups')
+  autoScalingGroups = module.params['autoScalingGroups']
   serviceRoleArn = module.params['serviceRoleArn']
-  deploymentStyle = module.params.get('deploymentStyle')
-
+  deploymentStyle = module.params['deploymentStyle']
+  targetGroupInfoList = module.params['targetGroupInfoList']
   connection = module.client(
       'codedeploy',
       retry_decorator=AWSRetry.jittered_backoff(
@@ -66,12 +67,13 @@ def main():
 
   if state == 'present':
     try:
-      deployment = connection.update_deployment_group(applicationName=applicationName,
+      deployment = connection.create_deployment_group(applicationName=applicationName,
                                                 deploymentGroupName=name,
                                                 deploymentConfigName=configName,
                                                 autoScalingGroups=autoScalingGroups,
                                                 serviceRoleArn=serviceRoleArn,
-                                                deploymentStyle=deploymentStyle)
+                                                deploymentStyle=deploymentStyle,
+                                                loadBalancerInfo={'targetGroupInfoList' :targetGroupInfoList})
     except (botocore.exceptions.BotoCoreError, botocore.exceptions.ClientError) as e:
       changed=False
       module.exit_json(changed=changed, deplyment=deployment)

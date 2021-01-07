@@ -32,12 +32,12 @@
     name: "{{default_prefix|lower}}{{ REGIONS[default_region] | lower }}-{{ default_account_alias|lower}}-{{default_platform|lower}}-{{item.deployment_group.name}}{{item.deployment_group.num}}"
     applicationName: "{{default_prefix|lower}}{{ REGIONS[default_region] | lower }}-{{ default_account_alias|lower}}-{{default_platform|lower}}-{{item.name}}{{item.num}}"
     configName: CodeDeployDefault.AllAtOnce
-    autoScalingGroups: "{{item.deployment_group.asg_group}}"
+    autoScalingGroups:
+      - "{{item.deployment_group.asg_group}}"
     serviceRoleArn: "{{iam_roles[item.deployment_group.iam_name].arn}}"
     deploymentStyle:
       deploymentType: IN_PLACE
-      deploymentOption: WITH_TRAFFIC_CONTROL
+      deploymentOption: WITHOUT_TRAFFIC_CONTROL
     region: "{{default_region}}"
     state: present
   loop: "{{codedeploy_metadata.application}}"
-  ignore_errors: yes
