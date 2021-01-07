@@ -269,7 +269,7 @@ ec2_bastion:
   iam_profile: aplz-ec2-basic-mgmt
   subnet: mgmt_a_zone
   image: ami-0c6bfbd045ac8b8ec   # Amazon Linux 2 AMI
-  key_name: amore-poc-bastion
+  key_name: "amore-{{default_stage}}-bastion"
   instance_profile: aplz-ec2-basic-mgmt
   security_groups:
     - "{{ security_groups.mgmt.group_id  | default('')}}"
@@ -281,7 +281,7 @@ autoscaling:
       type: t3.medium
       security_groups:
         - "{{ security_groups.web.group_id | default('') }}"
-      key_name: amore-poc-web
+      key_name: "amore-{{default_stage}}-web"
       image: ami-06ba0dad0df06956b
       instance_profile_name: aplz-ec2-basic-web
     was:
@@ -289,7 +289,7 @@ autoscaling:
       type: t3.large
       security_groups:
         - "{{ security_groups.was.group_id | default('') }}"
-      key_name: amore-poc-was
+      key_name: "amore-{{default_stage}}-was"
       image: ami-060043fbfcc808337
       instance_profile_name: aplz-ec2-basic-was
   autoscaling_groups:
