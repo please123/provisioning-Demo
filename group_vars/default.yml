@@ -8,6 +8,11 @@ default_state: present
 
 default_account_alias: "{{default_account}}{{default_stage}}"
 
+default_image:
+  bastion: ami-0c6bfbd045ac8b8ec
+  web: ami-06ba0dad0df06956b
+  was: ami-060043fbfcc808337
+
 # Constant Variable
 REGIONS:
   us-east-1: UE1
