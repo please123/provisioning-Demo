@@ -3,6 +3,7 @@
   elb_target_group_info:
     names:
       - "{{ default_account_alias }}-{{default_platform}}-{{alb[item.alb].system}}-ALB-{{alb[item.alb].name}}"
+    region: "{{default_region}}"
   loop: "{{ target_group }}"
   register: get_target_group_info
 
