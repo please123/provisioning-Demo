@@ -269,7 +269,7 @@ ec2_bastion:
   iam_profile: aplz-ec2-basic-mgmt
   subnet: mgmt_a_zone
   image: "{{default_image.bastion}}"
-  key_name: "amore-{{default_stage}}-bastion"
+  key_name: "amore-{{default_stage|lower}}-bastion"
   instance_profile: aplz-ec2-basic-mgmt
   security_groups:
     - "{{ security_groups.mgmt.group_id  | default('')}}"
@@ -281,7 +281,7 @@ autoscaling:
       type: t3.medium
       security_groups:
         - "{{ security_groups.web.group_id | default('') }}"
-      key_name: "amore-{{default_stage}}-web"
+      key_name: "amore-{{default_stage|lower}}-web"
       image: "{{default_image.web}}"
       instance_profile_name: aplz-ec2-basic-web
     was:
@@ -289,7 +289,7 @@ autoscaling:
       type: t3.large
       security_groups:
         - "{{ security_groups.was.group_id | default('') }}"
-      key_name: "amore-{{default_stage}}-was"
+      key_name: "amore-{{default_stage|lower}}-was"
       image: "{{default_image.was}}"
       instance_profile_name: aplz-ec2-basic-was
   autoscaling_groups:
