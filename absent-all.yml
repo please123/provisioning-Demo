@@ -10,8 +10,8 @@
         name: '{{role_name}}'
         tasks_from: absent
       loop:
-        - 16_Elasticache
-        - 14_RDS
+        - 17_Elasticache
+        - 16_RDS
         - 13_Autoscaling
         - 11_ALB
         - 10_TargetGroup
