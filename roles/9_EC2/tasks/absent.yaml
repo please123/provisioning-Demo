@@ -4,4 +4,4 @@
     region: "{{default_region}}"
     filters:
       tag:Name: "{{ default_prefix }}{{ REGIONS[default_region] }}-{{ default_account_alias }}-a-{{default_platform}}-bastion"
-    state: absent
+    state: terminated

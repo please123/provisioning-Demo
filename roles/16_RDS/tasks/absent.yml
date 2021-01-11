@@ -4,6 +4,7 @@
     command: delete
     instance_name: "{{ default_prefix | lower}}{{ REGIONS[default_region] | lower }}-{{ default_account_alias | lower }}-{{default_platform | lower }}-{{item.name | lower}}{{item.num}}"
     region: "{{ default_region }}"
+    wait: yes
   loop: "{{ rds_metadata.instances }}"
 
 
@@ -13,4 +14,3 @@
     name: "{{ default_prefix | lower }}{{ REGIONS[default_region] | lower }}-{{ default_account_alias | lower }}-{{default_platform | lower}}-{{item.value.name|lower}}"
     region: "{{ default_region }}"
   with_dict: "{{ rds_metadata.subnet_group}}"
-

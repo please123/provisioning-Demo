@@ -31,7 +31,7 @@
     desired_capacity: "{{item.value.capacity.desired}}"
     vpc_zone_identifier: "{{item.value.subnets}}"
     region: "{{default_region}}"
-    target_group_arns : "{{item.value.target_groups}}"
+    target_group_arns: "{{item.value.target_groups}}"
     tags: "{{item.value.tags | default([])}}"
     wait_for_instances: FALSE
   register: create_autosclaing_group
