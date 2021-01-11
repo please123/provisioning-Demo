@@ -1,22 +1,15 @@
-- name: "Create NAT Gateay"
-  ec2_vpc_nat_gateway:
-    subnet_id: "{{ subnets[item.value.subnet].id }}"
+- name: Get details on specific nat gateways
+  ec2_vpc_nat_gateway_info:
+    filters:
+      state: ['available']
     region: "{{default_region}}"
-    wait: yes
-    if_exist_do_not_create: true
-  with_dict: "{{ vpc_nats }}"
-  register: create_nat_gateway
-
-- name: "Gathering Nat Gateway Information Information"
-  ansible.builtin.set_fact:
-    nat_gateway: "{{ nat_gateway | default({}) | combine({item.item.key:{'nat_gateway_addresses':item.nat_gateway_addresses, 'nat_gateway_id':item.nat_gateway_id}})  }} "
-  with_items: "{{ create_nat_gateway.results }}"
+  register: specific_ngws
 
 - name: "Delete Nat Gateway"
   ec2_vpc_nat_gateway:
-    nat_gateway_id: "{{ item.value.nat_gateway_id }}"
+    nat_gateway_id: "{{ item.nat_gateway_id }}"
     region: "{{default_region}}"
     wait: yes
     release_eip: yes
     state: absent
-  with_dict: "{{nat_gateway}}"
+  loop: "{{specific_ngws.result}}"

@@ -5,7 +5,6 @@
     name: "{{ default_account | lower}}-{{ default_stage | lower}}-{{item.name | lower}}-{{default_platform | lower}}"
     versioning: yes
     region: "{{ default_region }}"
-    delete_public_access: yes
     tags:
       Name: "{{ default_account | lower}}-{{ default_stage | lower}}-{{item.name | lower}}-{{default_platform | lower}}"
       Company: "{{default_prefix}}"

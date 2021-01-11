@@ -67,6 +67,7 @@ def main():
 
   loadBalancerInfo={'targetGroupInfoList':targetGroupInfoList}
 
+  deployment = {}
   if state == 'present':
     try:
       deployment = connection.create_deployment_group(applicationName=applicationName,
@@ -83,7 +84,7 @@ def main():
     connection.delete_application(applicationName=name)
 
   changed=True
-  module.exit_json(changed=changed, deplyment=deployment)
+  module.exit_json(changed=changed, deplyment={})
 
 if __name__ == '__main__':
   main()
