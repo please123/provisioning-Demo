@@ -359,6 +359,7 @@ alb:
           - Type: forward
             TargetGroupName: "{{ target_groups.web_alb.http.target_group_name  | default([])  }}"
     service: Web Alb
+    use: WEBALB
   was_alb:
     name: WAS
     system: PRI1
@@ -375,6 +376,7 @@ alb:
           - Type: forward
             TargetGroupName:  "{{ target_groups.was_alb.http.target_group_name  | default([])  }}"
     service: Was Alb
+    use: WASALB
 
 target_group:
   - name: http

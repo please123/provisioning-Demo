@@ -14,7 +14,7 @@
       Country: KR
       Service: "{{item.value.service}}"
       Stage: "{{default_stage}}"
-      USE: WASALB
+      USE: "{{item.value.use}}"
   with_dict: "{{ alb }}"
   register: create_application_lb
 
