@@ -18,7 +18,7 @@
   }}"
   loop: "{{ create_iam_role.results }}"
 
-- name: Test123
+- name: "Create CodeDeploy Application"
   codedeploy:
     name: "{{default_prefix|lower}}{{ REGIONS[default_region] | lower }}-{{ default_account_alias|lower}}-{{default_platform|lower}}-{{item.name}}{{item.num}}"
     region: "{{default_region}}"
@@ -35,9 +35,11 @@
     autoScalingGroups:
       - "{{item.deployment_group.asg_group}}"
     serviceRoleArn: "{{iam_roles[item.deployment_group.iam_name].arn}}"
+    targetGroupInfoList:
+      - name: "{{target_groups.was_alb.http.target_group_name }}"
     deploymentStyle:
       deploymentType: IN_PLACE
-      deploymentOption: WITHOUT_TRAFFIC_CONTROL
+      deploymentOption: WITH_TRAFFIC_CONTROL
     region: "{{default_region}}"
     state: present
   loop: "{{codedeploy_metadata.application}}"

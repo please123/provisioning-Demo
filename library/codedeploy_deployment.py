@@ -33,7 +33,8 @@ def main():
       state=dict(choices=['present', 'absent'], default='present'),
       autoScalingGroups=dict(type='list',required=False),
       serviceRoleArn=dict(required=False),
-      deploymentStyle=dict(type='dict',required=False)
+      deploymentStyle=dict(type='dict',required=False),
+      targetGroupInfoList=dict(type='list',required=False)
   )
 
   module = AnsibleAWSModule(
@@ -56,12 +57,15 @@ def main():
   autoScalingGroups = module.params['autoScalingGroups']
   serviceRoleArn = module.params['serviceRoleArn']
   deploymentStyle = module.params['deploymentStyle']
+  targetGroupInfoList = module.params['targetGroupInfoList']
   connection = module.client(
       'codedeploy',
       retry_decorator=AWSRetry.jittered_backoff(
           retries=8, delay=3, catch_extra_error_codes=['ApplicationAlreadyExistsException']
       )
   )
+
+  loadBalancerInfo={'targetGroupInfoList':targetGroupInfoList}
 
   if state == 'present':
     try:
@@ -70,7 +74,8 @@ def main():
                                                 deploymentConfigName=configName,
                                                 autoScalingGroups=autoScalingGroups,
                                                 serviceRoleArn=serviceRoleArn,
-                                                deploymentStyle=deploymentStyle)
+                                                deploymentStyle=deploymentStyle,
+                                                loadBalancerInfo=loadBalancerInfo)
     except (botocore.exceptions.BotoCoreError, botocore.exceptions.ClientError) as e:
       changed=False
       module.exit_json(changed=changed, deplyment=deployment)
