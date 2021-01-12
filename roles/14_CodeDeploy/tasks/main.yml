@@ -20,7 +20,7 @@
 
 - name: "Create CodeDeploy Application"
   codedeploy:
-    name: "{{default_prefix|lower}}{{ REGIONS[default_region] | lower }}-{{ default_account_alias|lower}}-{{default_platform|lower}}-{{item.name}}{{item.num}}"
+    name: "{{default_prefix|lower}}{{ REGIONS[default_region] | lower }}-{{ default_account_alias|lower}}-{{default_platform|lower}}-{{item.name}}"
     region: "{{default_region}}"
     state: present
   loop: "{{codedeploy_metadata.application}}"
@@ -29,8 +29,8 @@
 
 - name: "Create CodeDeploy Deploy Group"
   codedeploy_deployment:
-    name: "{{default_prefix|lower}}{{ REGIONS[default_region] | lower }}-{{ default_account_alias|lower}}-{{default_platform|lower}}-{{item.deployment_group.name}}{{item.deployment_group.num}}"
-    applicationName: "{{default_prefix|lower}}{{ REGIONS[default_region] | lower }}-{{ default_account_alias|lower}}-{{default_platform|lower}}-{{item.name}}{{item.num}}"
+    name: "{{default_prefix|lower}}{{ REGIONS[default_region] | lower }}-{{ default_account_alias|lower}}-{{default_platform|lower}}-{{item.deployment_group.name}}"
+    applicationName: "{{default_prefix|lower}}{{ REGIONS[default_region] | lower }}-{{ default_account_alias|lower}}-{{default_platform|lower}}-{{item.name}}"
     configName: CodeDeployDefault.AllAtOnce
     autoScalingGroups:
       - "{{item.deployment_group.asg_group}}"

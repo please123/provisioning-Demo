@@ -467,10 +467,8 @@ codedeploy_metadata:
       iam_type: role
   application:
     - name: codedeploy
-      num: 02
       deployment_group:
         name: deploygroup
-        num: 02
         asg_group: "{{ autoscaling_groups.was.auto_scaling_group_name | default('')}}"
         config_name: CodeDeployDefault.AllAtOnce
         iam_name: was_role
